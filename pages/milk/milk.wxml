@@ -1,0 +1,51 @@
+<view class="container">
+  <view class="date-picker card">
+    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
+      <view class="date-display">
+        <text class="date-label">📅</text>
+        <text class="date-value">{{recordDate}}</text>
+        <text class="date-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 录入表单 -->
+  <view class="form-card card">
+    <view class="section-title">{{editingIndex >= 0 ? '编辑奶量' : '添加奶量'}}</view>
+    <view class="form-group">
+      <text class="form-label">时间</text>
+      <picker mode="time" value="{{formTime}}" bindchange="onTimeChange">
+        <view class="form-input picker-value">{{formTime || '选择时间'}}</view>
+      </picker>
+    </view>
+    <view class="form-group">
+      <text class="form-label">奶量 (ml)</text>
+      <view class="form-input-wrap">
+        <input class="form-input-field" type="number" placeholder="请输入奶量" value="{{formAmount}}" bindinput="onAmountInput" />
+      </view>
+    </view>
+    <view class="form-group">
+      <text class="form-label">类型</text>
+      <picker range="{{typeOptions}}" range-key="label" value="{{formTypeIndex}}" bindchange="onTypeChange">
+        <view class="form-input picker-value">{{typeOptions[formTypeIndex].label}}</view>
+      </picker>
+    </view>
+    <button class="btn-primary" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新' : '添加'}}</button>
+  </view>
+
+  <!-- 当天列表 -->
+  <view class="list-card card">
+    <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{milkRecords.length}})</view>
+    <view wx:if="{{milkRecords.length === 0}}" class="empty-state">暂无记录</view>
+    <view wx:for="{{milkRecords}}" wx:key="index" class="list-item">
+      <view class="list-item-left">
+        <view class="list-item-title">{{item.time}} · {{item.typeText}}</view>
+        <view class="list-item-desc">{{item.amount}} ml</view>
+      </view>
+      <view class="list-item-actions">
+        <text class="action-btn" data-index="{{index}}" bindtap="editItem">编辑</text>
+        <text class="action-btn danger" data-index="{{index}}" bindtap="deleteItem">删除</text>
+      </view>
+    </view>
+  </view>
+</view>

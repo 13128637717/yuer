@@ -1,0 +1,53 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/records/records",
+    "pages/stats/stats",
+    "pages/family/family",
+    "pages/milk/milk",
+    "pages/food/food",
+    "pages/sleep/sleep",
+    "pages/diary/diary"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FF9A8B",
+    "navigationBarTitleText": "宝宝成长助手",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FFF8F0",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF9A8B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab/home.png",
+        "selectedIconPath": "images/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/records/records",
+        "text": "记录",
+        "iconPath": "images/tab/records.png",
+        "selectedIconPath": "images/tab/records-active.png"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "统计",
+        "iconPath": "images/tab/stats.png",
+        "selectedIconPath": "images/tab/stats-active.png"
+      },
+      {
+        "pagePath": "pages/family/family",
+        "text": "我的",
+        "iconPath": "images/tab/family.png",
+        "selectedIconPath": "images/tab/family-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

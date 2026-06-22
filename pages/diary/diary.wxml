@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="date-picker card">
+    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
+      <view class="date-display">
+        <text class="date-label">📅</text>
+        <text class="date-value">{{recordDate}}</text>
+        <text class="date-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-card card">
+    <view class="section-title">📝 {{isToday ? '今日' : recordDate}}心得</view>
+    <textarea
+      class="diary-textarea"
+      placeholder="记录带娃心得、宝宝趣事..."
+      value="{{diary}}"
+      bindinput="onDiaryInput"
+      maxlength="2000"
+      auto-height
+    />
+    <view class="char-count">{{diary.length}}/2000</view>
+
+    <view class="image-section">
+      <view class="image-grid">
+        <view wx:for="{{diaryImages}}" wx:key="index" class="image-item">
+          <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
+          <view class="image-remove" data-index="{{index}}" bindtap="removeImage">×</view>
+        </view>
+        <view wx:if="{{diaryImages.length < 9}}" class="image-add" bindtap="chooseImage">
+          <text class="add-icon">+</text>
+          <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <button class="btn-primary" bindtap="save" disabled="{{uploading}}">保存心得</button>
+  </view>
+
+  <view class="history-card card">
+    <view class="section-title">历史心得</view>
+    <view wx:if="{{historyList.length === 0}}" class="empty-state">暂无历史记录</view>
+    <view wx:for="{{historyList}}" wx:key="recordDate" class="history-item">
+      <view class="history-date">{{item.recordDate}}</view>
+      <view class="history-content">{{item.diary}}</view>
+      <view wx:if="{{item.diaryImages.length > 0}}" class="history-images">
+        <image
+          wx:for="{{item.diaryImages}}"
+          wx:for-item="img"
+          wx:key="index"
+          src="{{img}}"
+          mode="aspectFill"
+          class="history-thumb"
+        />
+      </view>
+    </view>
+  </view>
+</view>

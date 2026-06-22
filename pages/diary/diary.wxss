@@ -1,0 +1,148 @@
+.date-picker {
+  margin-bottom: 24rpx;
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 0;
+}
+
+.date-label {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.date-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.date-arrow {
+  font-size: 20rpx;
+  color: var(--text-light);
+  margin-left: 12rpx;
+}
+
+.form-card {
+  margin-bottom: 24rpx;
+}
+
+.diary-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  background: #FAFAFA;
+  border: 2rpx solid var(--border);
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 24rpx;
+  color: var(--text-light);
+  margin: 8rpx 0 16rpx;
+}
+
+.image-section {
+  margin-bottom: 24rpx;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.image-item {
+  width: 160rpx;
+  height: 160rpx;
+  position: relative;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.image-item image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFF;
+  font-size: 28rpx;
+  text-align: center;
+  line-height: 40rpx;
+  border-radius: 0 0 0 12rpx;
+}
+
+.image-add {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed var(--border);
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-icon {
+  font-size: 48rpx;
+  color: var(--text-light);
+}
+
+.add-text {
+  font-size: 22rpx;
+  color: var(--text-light);
+  margin-top: 8rpx;
+}
+
+.history-card {
+  margin-bottom: 24rpx;
+}
+
+.history-item {
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid var(--border);
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-date {
+  font-size: 26rpx;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+
+.history-content {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.history-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.history-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+}

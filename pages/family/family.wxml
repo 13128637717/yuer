@@ -1,0 +1,205 @@
+<view class="container">
+  <template name="nickNameRow">
+    <view class="form-group wx-nick-group">
+      <text class="form-label">我的昵称</text>
+      <view class="form-input-wrap wx-nick-wrap {{hasValidNick ? 'is-valid' : ''}}">
+        <input
+          class="form-input-field wx-nick-input"
+          type="nickname"
+          placeholder="点击使用微信昵称"
+          value="{{nickName}}"
+          bindinput="onNickNameInput"
+          bindnicknamereview="onNickNameReview"
+          bindblur="onNickNameBlur"
+        />
+      </view>
+      <view wx:if="{{!hasValidNick}}" class="wx-nick-hint">请点击上方，一键使用微信昵称（无需手动输入）</view>
+    </view>
+  </template>
+
+  <!-- 无家庭：引导创建/加入 -->
+  <block wx:if="{{!hasFamily}}">
+    <view class="welcome-card card">
+      <view class="welcome-icon">👨‍👩‍👧</view>
+      <view class="welcome-title">开始记录宝宝成长</view>
+      <view class="welcome-desc">创建家庭或输入邀请码加入，与家人共同记录</view>
+    </view>
+
+    <view wx:if="{{!showCreateForm && !showJoinForm}}" class="action-btns">
+      <button class="btn-primary" bindtap="showCreate">创建家庭</button>
+      <button class="btn-secondary" style="margin-top:24rpx" bindtap="showJoin">加入家庭</button>
+    </view>
+
+    <!-- 创建表单 -->
+    <view wx:if="{{showCreateForm}}" class="form-card card">
+      <view class="section-title">创建家庭</view>
+      <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group">
+        <text class="form-label">宝宝姓名</text>
+        <view class="form-input-wrap">
+          <input class="form-input-field" placeholder="请输入宝宝姓名" value="{{babyName}}" bindinput="onBabyNameInput" />
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">宝宝生日</text>
+        <picker mode="date" value="{{babyBirth}}" bindchange="onBabyBirthChange">
+          <view class="form-input picker-value">{{babyBirth || '请选择生日'}}</view>
+        </picker>
+      </view>
+      <button class="btn-primary" bindtap="createFamily">确认创建</button>
+    </view>
+
+    <!-- 加入表单 -->
+    <view wx:if="{{showJoinForm}}" class="form-card card">
+      <view class="section-title">加入家庭</view>
+      <view wx:if="{{fromInvite}}" class="invite-banner">
+        <text class="invite-banner-icon">💌</text>
+        <text class="invite-banner-text">您收到了家庭邀请，确认昵称后即可加入</text>
+      </view>
+      <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group">
+        <text class="form-label">邀请码（6位）</text>
+        <view class="form-input-wrap">
+          <input class="form-input-field" placeholder="请输入邀请码" value="{{inviteCode}}" bindinput="onInviteCodeInput" maxlength="6" />
+        </view>
+      </view>
+      <button class="btn-primary" bindtap="joinFamily">确认加入</button>
+    </view>
+  </block>
+
+  <!-- 有家庭：家庭信息与设置 -->
+  <block wx:else>
+    <!-- 宝宝信息 -->
+    <view class="family-info card">
+      <block wx:if="{{!showBabyEditForm}}">
+        <view class="baby-row">
+          <text class="baby-emoji">👶</text>
+          <view class="baby-info-main">
+            <view class="info-name">{{family.babyName}}</view>
+            <view class="info-birth">生日：{{family.babyBirth || '未设置'}}</view>
+          </view>
+          <view class="action-btn" bindtap="showBabyEdit">编辑</view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="section-title">编辑宝宝信息</view>
+        <view class="form-group">
+          <text class="form-label">宝宝姓名</text>
+          <view class="form-input-wrap">
+            <input class="form-input-field" placeholder="请输入宝宝姓名" value="{{editBabyName}}" bindinput="onEditBabyNameInput" />
+          </view>
+        </view>
+        <view class="form-group">
+          <text class="form-label">宝宝生日</text>
+          <picker mode="date" value="{{editBabyBirth}}" bindchange="onEditBabyBirthChange">
+            <view class="form-input picker-value">{{editBabyBirth || '请选择生日'}}</view>
+          </picker>
+        </view>
+        <view class="edit-btns">
+          <button class="btn-primary" bindtap="saveBabyInfo">保存</button>
+          <button class="btn-secondary" style="margin-top:16rpx" bindtap="cancelBabyEdit">取消</button>
+        </view>
+      </block>
+    </view>
+
+    <!-- 邀请家庭成员 -->
+    <view class="card invite-section">
+      <view class="section-title">邀请家庭成员</view>
+      <view class="invite-desc">邀请家人一起记录宝宝成长，多人可同时查看和添加记录</view>
+      <view class="invite-code-box">
+        <text class="invite-code-label">邀请码</text>
+        <text class="invite-code-value">{{family.familyId}}</text>
+      </view>
+      <view class="invite-actions">
+        <button class="btn-primary invite-share-btn" open-type="share">微信邀请</button>
+        <button class="btn-secondary invite-copy-btn" style="margin-top:16rpx" bindtap="copyInviteCode">复制邀请信息</button>
+      </view>
+    </view>
+
+    <!-- 成员列表 -->
+    <view class="card">
+      <view class="section-title">家庭成员</view>
+      <template wx:if="{{!hasValidNick}}" is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view wx:for="{{family.members}}" wx:key="openid" class="member-item">
+        <view class="member-info">
+          <text class="member-name">{{item.nickName}}</text>
+          <text class="member-role">{{item.role === 'creator' ? '创建者' : '成员'}}</text>
+        </view>
+        <view wx:if="{{isCreator && item.role !== 'creator'}}" class="action-btn danger" data-openid="{{item.openid}}" data-name="{{item.nickName}}" bindtap="removeMember">移除</view>
+      </view>
+    </view>
+
+    <!-- 通知设置 -->
+    <view class="card">
+      <view class="section-title">通知设置</view>
+      <view class="setting-item">
+        <text>开启每日推送</text>
+        <switch checked="{{notifyEnabled}}" bindchange="onNotifySwitch" color="#FF9A8B" />
+      </view>
+      <view class="setting-hint">每天在设定时间（北京时间）自动推送前一天成长日报，每小时整点检查一次</view>
+      <view class="form-group" style="margin-top:24rpx">
+        <text class="form-label">企业微信群机器人 Webhook</text>
+        <view class="form-input-wrap">
+          <input class="form-input-field" placeholder="https://qyapi.weixin.qq.com/..." value="{{robotWebhook}}" bindinput="onWebhookInput" />
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">推送时间</text>
+        <picker mode="time" value="{{notifyTime}}" bindchange="onNotifyTimeChange">
+          <view class="form-input picker-value">{{notifyTime}}</view>
+        </picker>
+      </view>
+      <button class="btn-primary" bindtap="onSaveSettingsTap">保存设置</button>
+      <button class="btn-secondary" style="margin-top:24rpx" bindtap="onTestNotifyTap">立即测试推送</button>
+    </view>
+
+    <!-- 切换家庭 -->
+    <view wx:if="{{!showCreateForm && !showJoinForm}}" class="card">
+      <view class="section-title">切换家庭</view>
+      <view class="switch-hint">加入或创建新家庭后，将自动离开当前家庭</view>
+      <button class="btn-secondary" bindtap="showSwitchJoin">加入其他家庭</button>
+      <button class="btn-secondary" style="margin-top:16rpx" bindtap="showSwitchCreate">创建新家庭</button>
+    </view>
+
+    <!-- 切换：创建表单 -->
+    <view wx:if="{{showCreateForm && switchingFamily}}" class="form-card card">
+      <view class="section-title">创建新家庭</view>
+      <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group">
+        <text class="form-label">宝宝姓名</text>
+        <view class="form-input-wrap">
+          <input class="form-input-field" placeholder="请输入宝宝姓名" value="{{babyName}}" bindinput="onBabyNameInput" />
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">宝宝生日</text>
+        <picker mode="date" value="{{babyBirth}}" bindchange="onBabyBirthChange">
+          <view class="form-input picker-value">{{babyBirth || '请选择生日'}}</view>
+        </picker>
+      </view>
+      <button class="btn-primary" bindtap="createFamily">确认创建</button>
+    </view>
+
+    <!-- 切换：加入表单 -->
+    <view wx:if="{{showJoinForm && switchingFamily}}" class="form-card card">
+      <view class="section-title">加入其他家庭</view>
+      <view wx:if="{{fromInvite}}" class="invite-banner">
+        <text class="invite-banner-icon">💌</text>
+        <text class="invite-banner-text">您收到了家庭邀请，确认昵称后即可加入</text>
+      </view>
+      <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group">
+        <text class="form-label">邀请码（6位）</text>
+        <view class="form-input-wrap">
+          <input class="form-input-field" placeholder="请输入邀请码" value="{{inviteCode}}" bindinput="onInviteCodeInput" maxlength="6" />
+        </view>
+      </view>
+      <button class="btn-primary" bindtap="joinFamily">确认加入</button>
+    </view>
+
+    <!-- 退出家庭 -->
+    <view class="leave-section">
+      <button class="btn-secondary danger-btn" bindtap="leaveFamily">退出家庭</button>
+    </view>
+  </block>
+</view>

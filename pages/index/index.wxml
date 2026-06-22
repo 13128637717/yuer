@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- 无家庭引导 -->
+  <view wx:if="{{!hasFamily}}" class="no-family">
+    <view class="no-family-icon">👶</view>
+    <view class="no-family-title">欢迎使用宝宝成长助手</view>
+    <view class="no-family-desc">请先创建或加入家庭，开始记录宝宝成长</view>
+    <button class="btn-primary" bindtap="goFamily">去创建/加入家庭</button>
+  </view>
+
+  <!-- 有家庭内容 -->
+  <block wx:else>
+    <!-- 宝宝信息卡片 -->
+    <view class="baby-card card">
+      <view class="baby-info">
+        <view class="baby-avatar">👶</view>
+        <view class="baby-detail">
+          <view class="baby-name">{{babyName}}</view>
+          <view class="baby-age">{{monthAge}}</view>
+        </view>
+      </view>
+      <view class="family-link" bindtap="goFamily">
+        <text>家庭管理</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 今日统计 -->
+    <view class="section-title">今日概况</view>
+    <view class="stats-row">
+      <view class="stat-card card">
+        <view class="stat-label">奶量</view>
+        <view>
+          <text class="stat-number">{{totalMilk}}</text>
+          <text class="stat-unit">ml</text>
+        </view>
+      </view>
+      <view class="stat-card card">
+        <view class="stat-label">辅食</view>
+        <view>
+          <text class="stat-number">{{foodGrams}}</text>
+          <text class="stat-unit">g</text>        </view>
+      </view>
+      <view class="stat-card card">
+        <view class="stat-label">睡眠</view>
+        <view class="stat-sleep">{{sleepText}}</view>
+      </view>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="section-title">快捷记录</view>
+    <view class="quick-grid">
+      <view class="quick-item card" bindtap="goMilk">
+        <view class="quick-icon milk">🍼</view>
+        <view class="quick-text">记奶量</view>
+      </view>
+      <view class="quick-item card" bindtap="goFood">
+        <view class="quick-icon food">🥣</view>
+        <view class="quick-text">记辅食</view>
+      </view>
+      <view class="quick-item card" bindtap="goSleep">
+        <view class="quick-icon sleep">😴</view>
+        <view class="quick-text">记睡眠</view>
+      </view>
+      <view class="quick-item card" bindtap="goDiary">
+        <view class="quick-icon diary">📝</view>
+        <view class="quick-text">写心得</view>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,56 @@
+<view class="container">
+  <view wx:if="{{!hasFamily}}" class="empty-state">
+    <text>请先创建或加入家庭</text>
+  </view>
+
+  <block wx:else>
+    <!-- 时间段切换 -->
+    <view class="tabs card">
+      <view class="tab-item {{days === 7 ? 'active' : ''}}" data-days="7" bindtap="switchDays">最近7天</view>
+      <view class="tab-item {{days === 30 ? 'active' : ''}}" data-days="30" bindtap="switchDays">最近30天</view>
+    </view>
+
+    <!-- 奶量趋势图 -->
+    <view class="chart-card card">
+      <view class="chart-title">🍼 奶量趋势 (ml)</view>
+      <view class="chart-container">
+        <ec-canvas id="milkChart" canvas-id="milkChart" ec="{{ecMilk}}"></ec-canvas>
+      </view>
+    </view>
+
+    <!-- 辅食趋势图 -->
+    <view class="chart-card card">
+      <view class="chart-title">🥣 辅食趋势 (g)</view>
+      <view class="chart-container">
+        <ec-canvas id="foodChart" canvas-id="foodChart" ec="{{ecFood}}"></ec-canvas>
+      </view>
+    </view>
+
+    <!-- 睡眠趋势图 -->
+    <view class="chart-card card">
+      <view class="chart-title">😴 睡眠趋势 (小时)</view>
+      <view class="chart-container">
+        <ec-canvas id="sleepChart" canvas-id="sleepChart" ec="{{ecSleep}}"></ec-canvas>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-hint">加载中...</view>
+
+    <!-- 导出记录 -->
+    <view class="export-section card">
+      <button wx:if="{{!showExport}}" class="btn-primary" bindtap="openExport">导出记录</button>
+      <block wx:if="{{showExport}}">
+        <view class="section-title">📤 导出记录</view>
+        <view class="export-tabs">
+          <view class="export-tab {{exportRange === 'week' ? 'active' : ''}}" data-range="week" bindtap="switchExportRange">最近7天</view>
+          <view class="export-tab {{exportRange === 'month' ? 'active' : ''}}" data-range="month" bindtap="switchExportRange">最近30天</view>
+          <view class="export-tab {{exportRange === 'all' ? 'active' : ''}}" data-range="all" bindtap="switchExportRange">全部记录</view>
+        </view>
+        <scroll-view class="export-text-wrap" scroll-y="{{true}}">
+          <view class="export-text" user-select>{{exportLoading ? '加载中...' : exportText}}</view>
+        </scroll-view>
+        <button class="btn-primary" style="margin-top:24rpx" bindtap="copyExportText" disabled="{{exportLoading || !exportText}}">复制到剪贴板</button>
+      </block>
+    </view>
+  </block>
+</view>

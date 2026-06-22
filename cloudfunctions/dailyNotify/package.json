@@ -1,0 +1,10 @@
+{
+  "name": "dailyNotify",
+  "version": "1.0.0",
+  "description": "每日定时推送企业微信群消息",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "got": "^11.8.6"
+  }
+}

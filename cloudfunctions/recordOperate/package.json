@@ -1,0 +1,9 @@
+{
+  "name": "recordOperate",
+  "version": "1.0.0",
+  "description": "记录增删改查",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

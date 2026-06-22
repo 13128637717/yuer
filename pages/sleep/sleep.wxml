@@ -1,0 +1,93 @@
+<view class="container">
+
+  <view class="date-picker card">
+
+    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
+
+      <view class="date-display">
+
+        <text class="date-label">📅</text>
+
+        <text class="date-value">{{recordDate}}</text>
+
+        <text class="date-arrow">▼</text>
+
+      </view>
+
+    </picker>
+
+  </view>
+
+
+
+  <view class="form-card card">
+
+    <view class="section-title">{{editingIndex >= 0 ? '编辑睡眠' : '添加睡眠'}}</view>
+
+    <view class="form-group">
+
+      <text class="form-label">入睡时间</text>
+
+      <picker mode="time" value="{{formStartTime}}" bindchange="onStartTimeChange">
+
+        <view class="form-input picker-value">{{formStartTime || '选择时间'}}</view>
+
+      </picker>
+
+    </view>
+
+    <view class="form-group">
+
+      <text class="form-label">起床时间</text>
+
+      <picker mode="time" value="{{formEndTime}}" bindchange="onEndTimeChange">
+
+        <view class="form-input picker-value">{{formEndTime || '选择时间'}}</view>
+
+      </picker>
+
+    </view>
+
+    <view class="duration-display" wx:if="{{formDurationText}}">
+
+      预计时长：{{formDurationText}}
+
+    </view>
+
+    <button class="btn-primary" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新' : '添加'}}</button>
+
+  </view>
+
+
+
+  <view class="list-card card">
+
+    <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{sleepRecords.length}})</view>
+
+    <view wx:if="{{sleepRecords.length === 0}}" class="empty-state">暂无记录</view>
+
+    <view wx:for="{{sleepRecords}}" wx:key="index" class="list-item">
+
+      <view class="list-item-left">
+
+        <view class="list-item-title">{{item.startTime}} - {{item.endTime}}</view>
+
+        <view class="list-item-desc">{{item.durationText}}</view>
+
+      </view>
+
+      <view class="list-item-actions">
+
+        <text class="action-btn" data-index="{{index}}" bindtap="editItem">编辑</text>
+
+        <text class="action-btn danger" data-index="{{index}}" bindtap="deleteItem">删除</text>
+
+      </view>
+
+    </view>
+
+  </view>
+
+</view>
+
+

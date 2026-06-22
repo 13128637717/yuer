@@ -1,0 +1,9 @@
+{
+  "name": "familyOperate",
+  "version": "1.0.0",
+  "description": "家庭创建、加入、退出、成员管理、设置",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,59 @@
+.date-picker {
+  margin-bottom: 24rpx;
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 0;
+}
+
+.date-label {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.date-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.date-arrow {
+  font-size: 20rpx;
+  color: var(--text-light);
+  margin-left: 12rpx;
+}
+
+.section {
+  margin-bottom: 24rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.section-total {
+  font-size: 26rpx;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.empty-hint {
+  font-size: 26rpx;
+  color: var(--text-light);
+  padding: 16rpx 0;
+}
+
+.diary-preview {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-height: 200rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
