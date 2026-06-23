@@ -27,7 +27,7 @@
 
     <view wx:if="{{!showCreateForm && !showJoinForm}}" class="action-btns">
       <button class="btn-primary" hover-class="button-hover" bindtap="showCreate">创建家庭</button>
-      <button class="btn-secondary" style="margin-top:24rpx" hover-class="button-hover" bindtap="showJoin">加入家庭</button>
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="showJoin">加入家庭</button>
     </view>
 
     <!-- 创建表单 -->
@@ -97,7 +97,7 @@
         </view>
         <view class="edit-btns">
           <button class="btn-primary" hover-class="button-hover" bindtap="saveBabyInfo">保存</button>
-          <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="cancelBabyEdit">取消</button>
+          <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="cancelBabyEdit">取消</button>
         </view>
       </block>
     </view>
@@ -112,7 +112,7 @@
       </view>
       <view class="invite-actions">
         <button class="btn-primary invite-share-btn" hover-class="button-hover" open-type="share">微信邀请</button>
-        <button class="btn-secondary invite-copy-btn" style="margin-top:16rpx" hover-class="button-hover" bindtap="copyInviteCode">复制邀请信息</button>
+        <button class="btn-secondary invite-copy-btn btn-stack-gap" hover-class="button-hover" bindtap="copyInviteCode">复制邀请信息</button>
       </view>
     </view>
 
@@ -148,7 +148,7 @@
         <time-picker value="{{notifyTime}}" bindchange="onNotifyTimeChange" />
       </view>
       <button class="btn-primary" hover-class="button-hover" bindtap="onSaveSettingsTap">保存设置</button>
-      <button class="btn-secondary" style="margin-top:24rpx" hover-class="button-hover" bindtap="onTestNotifyTap">立即测试推送</button>
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="onTestNotifyTap">立即测试推送</button>
     </view>
 
     <!-- 切换家庭 -->
@@ -156,7 +156,7 @@
       <view class="section-title">切换家庭</view>
       <view class="switch-hint">加入或创建新家庭后，将自动离开当前家庭</view>
       <button class="btn-secondary" hover-class="button-hover" bindtap="showSwitchJoin">加入其他家庭</button>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="showSwitchCreate">创建新家庭</button>
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="showSwitchCreate">创建新家庭</button>
     </view>
 
     <!-- 切换：创建表单 -->

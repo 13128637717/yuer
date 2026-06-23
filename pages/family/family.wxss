@@ -210,6 +210,27 @@
   background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
 }
 
+/* 除「退出家庭」外，主/次按钮尺寸统一 */
+.btn-primary,
+.btn-secondary:not(.danger-btn) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.btn-secondary:not(.danger-btn) {
+  padding: 18rpx 0;
+}
+
+.btn-stack-gap {
+  margin-top: 24rpx;
+}
+
 .leave-section {
   margin-top: 32rpx;
   padding-bottom: 32rpx;
