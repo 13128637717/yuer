@@ -7,6 +7,7 @@ const { formatRecordsExport } = require('../../utils/record');
 let milkChart = null;
 let sleepChart = null;
 let foodChart = null;
+let poopChart = null;
 
 function initMilkChart(canvas, width, height, dpr) {
   milkChart = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
@@ -56,6 +57,22 @@ function initFoodChart(canvas, width, height, dpr) {
   return foodChart;
 }
 
+function initPoopChart(canvas, width, height, dpr) {
+  poopChart = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
+  canvas.setChart(poopChart);
+  poopChart.setOption({
+    color: ['#C4A882'],
+    animationDuration: 650,
+    animationEasing: 'cubicOut',
+    grid: { left: '12%', right: '5%', top: '15%', bottom: '15%' },
+    tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.96)', textStyle: { color: '#333333' } },
+    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10, color: '#999999' }, axisLine: { lineStyle: { color: '#F0E6DE' } } },
+    yAxis: { type: 'value', name: '次', minInterval: 1, axisLabel: { fontSize: 10, color: '#999999' }, splitLine: { lineStyle: { color: '#F5EDE3' } } },
+    series: [{ name: '拉粑粑次数', type: 'bar', data: [], barMaxWidth: 24, itemStyle: { borderRadius: [8, 8, 0, 0] } }]
+  });
+  return poopChart;
+}
+
 Page({
   data: {
     hasFamily: false,
@@ -63,6 +80,7 @@ Page({
     ecMilk: { onInit: initMilkChart },
     ecSleep: { onInit: initSleepChart },
     ecFood: { onInit: initFoodChart },
+    ecPoop: { onInit: initPoopChart },
     loading: true,
     showExport: false,
     exportRange: 'week',
@@ -100,6 +118,7 @@ Page({
       const milkData = stats.map((s) => s.totalMilk);
       const sleepData = stats.map((s) => Math.round((s.totalSleepMin / 60) * 10) / 10);
       const foodData = stats.map((s) => s.foodGrams || 0);
+      const poopData = stats.map((s) => s.poopCount || 0);
 
       if (milkChart) {
         milkChart.setOption({
@@ -117,6 +136,12 @@ Page({
         foodChart.setOption({
           xAxis: { data: dates },
           series: [{ data: foodData }]
+        });
+      }
+      if (poopChart) {
+        poopChart.setOption({
+          xAxis: { data: dates },
+          series: [{ data: poopData }]
         });
       }
 

@@ -150,6 +150,10 @@
   background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
 }
 
+.quick-item.poop {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8EF 100%);
+}
+
 .quick-icon {
   font-size: 46rpx;
   margin-bottom: 16rpx;

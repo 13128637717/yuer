@@ -32,5 +32,19 @@ module.exports = {
   STATS_DAYS: {
     WEEK: 7,
     MONTH: 30
+  },
+
+  // 拉粑粑状态
+  POOP_STATUS_OPTIONS: [
+    { value: 'normal', label: '正常' },
+    { value: 'loose', label: '稀' },
+    { value: 'dry', label: '干' },
+    { value: 'green', label: '绿便' }
+  ],
+  POOP_STATUS_MAP: {
+    normal: '正常',
+    loose: '稀',
+    dry: '干',
+    green: '绿便'
   }
 };

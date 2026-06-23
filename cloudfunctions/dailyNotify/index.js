@@ -83,6 +83,7 @@ function aggregateRecord(record) {
   let formulaMilk = 0;
   let totalSleepMin = 0;
   let foodGrams = 0;
+  let poopCount = 0;
 
   if (record) {
     (record.milkRecords || []).forEach((m) => {
@@ -96,9 +97,10 @@ function aggregateRecord(record) {
     (record.sleepRecords || []).forEach((s) => {
       totalSleepMin += s.duration || 0;
     });
+    poopCount = (record.poopRecords || []).length;
   }
 
-  return { totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams };
+  return { totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount };
 }
 
 function formatSleepText(totalSleepMin) {
@@ -110,14 +112,14 @@ function formatSleepText(totalSleepMin) {
   return `${sleepH} 小时 ${sleepM} 分钟`;
 }
 
-function buildReportContent({ yesterday, babyName, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams }) {
+function buildReportContent({ yesterday, babyName, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount }) {
   const header = [
     '🌱 **宝宝成长日报**',
     `> 📅 ${yesterday}　👶 ${babyName}`,
     ''
   ];
 
-  if (!totalMilk && !foodGrams && !totalSleepMin) {
+  if (!totalMilk && !foodGrams && !totalSleepMin && !poopCount) {
     return [
       ...header,
       '📝 昨日暂无喂养记录',
@@ -140,6 +142,12 @@ function buildReportContent({ yesterday, babyName, totalMilk, breastMilk, formul
 
   if (foodGrams > 0) {
     sections.push(`🥣 辅食　${foodGrams} g`, '');
+  }
+
+  if (poopCount > 0) {
+    sections.push(`💩 拉粑粑　${poopCount} 次`, '');
+  } else {
+    sections.push('💩 拉粑粑　暂无记录', '');
   }
 
   sections.push(`😴 睡眠　${formatSleepText(totalSleepMin)}`, '');

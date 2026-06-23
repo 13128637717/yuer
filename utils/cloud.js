@@ -27,6 +27,46 @@ function callFunction(name, data = {}) {
 }
 
 /**
+ * 调用云函数（不弹 toast，用于图片解析等静默场景）
+ */
+function callFunctionSilent(name, data = {}) {
+  return new Promise((resolve, reject) => {
+    wx.cloud.callFunction({
+      name,
+      data,
+      success: (res) => resolve(res.result || {}),
+      fail: (err) => reject(err)
+    });
+  });
+}
+
+/**
+ * 通过云函数管理员权限将 cloud:// fileID 转为临时 HTTPS 链接
+ */
+async function resolveCloudFileUrls(fileIds) {
+  const list = (fileIds || []).map((id) => String(id));
+  if (list.length === 0) return [];
+
+  const cloudIds = list.filter((id) => id.startsWith('cloud://'));
+  if (cloudIds.length === 0) return list;
+
+  try {
+    const result = await callFunctionSilent('recordOperate', {
+      action: 'resolveFileUrls',
+      fileIds: list
+    });
+    if (result.success === false) {
+      console.warn('云图片解析失败:', result.message);
+      return list;
+    }
+    return result.urls || list;
+  } catch (err) {
+    console.error('resolveFileUrls 云函数调用失败:', err);
+    return list;
+  }
+}
+
+/**
  * 上传图片到云存储
  */
 function uploadImage(filePath, cloudPath) {
@@ -144,6 +184,7 @@ function requireFamily() {
 module.exports = {
   callFunction,
   uploadImage,
+  resolveCloudFileUrls,
   getFamilyContext,
   applyFamilyContext,
   syncFamilyContext,

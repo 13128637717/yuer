@@ -27,6 +27,10 @@
   background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
 }
 
+.poop-chart {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8EF 100%);
+}
+
 .chart-title {
   display: inline-flex;
   align-items: center;

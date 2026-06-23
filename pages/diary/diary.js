@@ -1,4 +1,4 @@
-const { callFunction, uploadImage, getFamilyContext, ensureFamily } = require('../../utils/cloud');
+const { callFunction, uploadImage, resolveCloudFileUrls, getFamilyContext, ensureFamily } = require('../../utils/cloud');
 const { today } = require('../../utils/date');
 
 Page({
@@ -8,6 +8,7 @@ Page({
     isToday: true,
     diary: '',
     diaryImages: [],
+    diaryImageUrls: [],
     historyList: [],
     uploading: false
   },
@@ -38,9 +39,12 @@ Page({
         recordDate: this.data.recordDate
       });
       const record = res.record || {};
+      const diaryImages = record.diaryImages || [];
+      const diaryImageUrls = await resolveCloudFileUrls(diaryImages);
       this.setData({
         diary: record.diary || '',
-        diaryImages: record.diaryImages || []
+        diaryImages,
+        diaryImageUrls
       });
     } catch (err) {
       console.error(err);
@@ -53,7 +57,11 @@ Page({
         action: 'getDiaryList',
         limit: 20
       });
-      const list = (res.list || []).filter((item) => item.recordDate !== this.data.recordDate);
+      const rawList = (res.list || []).filter((item) => item.recordDate !== this.data.recordDate);
+      const list = await Promise.all(rawList.map(async (item) => ({
+        ...item,
+        diaryImageUrls: await resolveCloudFileUrls(item.diaryImages || [])
+      })));
       this.setData({ historyList: list });
     } catch (err) {
       console.error(err);
@@ -78,19 +86,22 @@ Page({
         this.setData({ uploading: true });
         const { familyId } = getFamilyContext();
         const newImages = [...this.data.diaryImages];
+        const newUrls = [...this.data.diaryImageUrls];
 
         for (const file of res.tempFiles) {
           const ext = file.tempFilePath.split('.').pop() || 'jpg';
           const cloudPath = `diary/${familyId}/${this.data.recordDate}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
           try {
             const fileID = await uploadImage(file.tempFilePath, cloudPath);
+            const [url] = await resolveCloudFileUrls([fileID]);
             newImages.push(fileID);
+            newUrls.push(url);
           } catch (err) {
             console.error('上传失败:', err);
           }
         }
 
-        this.setData({ diaryImages: newImages, uploading: false });
+        this.setData({ diaryImages: newImages, diaryImageUrls: newUrls, uploading: false });
       }
     });
   },
@@ -98,14 +109,15 @@ Page({
   removeImage(e) {
     const idx = e.currentTarget.dataset.index;
     const newImages = this.data.diaryImages.filter((_, i) => i !== idx);
-    this.setData({ diaryImages: newImages });
+    const newUrls = this.data.diaryImageUrls.filter((_, i) => i !== idx);
+    this.setData({ diaryImages: newImages, diaryImageUrls: newUrls });
   },
 
   previewImage(e) {
     const url = e.currentTarget.dataset.url;
     wx.previewImage({
       current: url,
-      urls: this.data.diaryImages
+      urls: this.data.diaryImageUrls
     });
   },
 
@@ -114,7 +126,7 @@ Page({
     const item = this.data.historyList[historyIndex];
     wx.previewImage({
       current: url,
-      urls: (item && item.diaryImages) || [url]
+      urls: (item && item.diaryImageUrls) || [url]
     });
   },
 

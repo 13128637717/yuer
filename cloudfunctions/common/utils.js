@@ -109,6 +109,7 @@ async function getOrCreateRecord(familyId, recordDate, openid) {
     milkRecords: [],
     foodRecords: [],
     sleepRecords: [],
+    poopRecords: [],
     diary: '',
     diaryImages: [],
     updateTime: db.serverDate()

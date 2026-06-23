@@ -1,4 +1,5 @@
 const { formatDuration, calcSleepDuration } = require('./date');
+const { POOP_STATUS_MAP } = require('./constants');
 
 /**
  * 计算辅食总克数（不论 unit，累加 amount）
@@ -35,11 +36,24 @@ function formatDayExport(record) {
     ? `${sleepTexts.join('+')}=${formatDuration(totalSleepMin)}（总${formatDuration(totalSleepMin)}）`
     : `0分钟（总0分钟）`;
 
+  const poopList = record.poopRecords || [];
+  const poopCount = poopList.length;
+  let poopLine = `0次`;
+  if (poopCount > 0) {
+    const parts = poopList.map((p) => `${p.time}${POOP_STATUS_MAP[p.status] || p.status || ''}`);
+    poopLine = `${poopCount}次（${parts.join('+')}）`;
+    const imageCount = poopList.filter((p) => p.image).length;
+    if (imageCount > 0) {
+      poopLine = `${poopCount}次（${parts.join('+')}，含${imageCount}张状态图）`;
+    }
+  }
+
   const lines = [
     record.recordDate,
     `奶量：${milkLine}`,
     `辅食：${foodLine}`,
-    `睡眠：${sleepLine}`
+    `睡眠：${sleepLine}`,
+    `拉粑粑：${poopLine}`
   ];
 
   const diary = (record.diary || '').trim();
@@ -63,8 +77,9 @@ function formatRecordsExport(records) {
     const hasMilk = (r.milkRecords || []).length > 0;
     const hasFood = (r.foodRecords || []).length > 0;
     const hasSleep = (r.sleepRecords || []).length > 0;
+    const hasPoop = (r.poopRecords || []).length > 0;
     const hasDiary = !!(r.diary && r.diary.trim()) || (r.diaryImages || []).length > 0;
-    return hasMilk || hasFood || hasSleep || hasDiary;
+    return hasMilk || hasFood || hasSleep || hasPoop || hasDiary;
   });
 
   if (withData.length === 0) return '暂无记录';

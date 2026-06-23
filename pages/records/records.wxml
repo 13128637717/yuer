@@ -66,6 +66,23 @@
       <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goSleep">添加/编辑睡眠</button>
     </view>
 
+    <!-- 拉粑粑区 -->
+    <view class="section card poop-section fade-up" hover-class="card-hover">
+      <view class="section-header">
+        <view class="section-title" style="margin-bottom:0">💩 拉粑粑记录</view>
+        <view class="section-total">共 {{poopCount}} 次</view>
+      </view>
+      <view wx:if="{{poopRecords.length === 0}}" class="empty-hint">今天还没有拉粑粑记录</view>
+      <view wx:for="{{poopRecords}}" wx:key="index" class="list-item poop-list-item" hover-class="list-item-hover">
+        <view class="list-item-left">
+          <view class="list-item-title">{{item.time}} · {{item.statusText}}</view>
+          <view wx:if="{{item.image}}" class="list-item-desc">已附状态图</view>
+        </view>
+        <image wx:if="{{item.image}}" class="poop-thumb" src="{{item.image}}" mode="aspectFill" />
+      </view>
+      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goPoop">添加/编辑拉粑粑</button>
+    </view>
+
     <!-- 心得区 -->
     <view class="section card diary-section fade-up" hover-class="card-hover">
       <view class="section-title">📝 带娃心得</view>

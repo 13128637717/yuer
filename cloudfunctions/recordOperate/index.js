@@ -27,10 +27,14 @@ exports.main = async (event, context) => {
         return await saveSleep(familyId, event, openid);
       case 'saveDiary':
         return await saveDiary(familyId, event, openid);
+      case 'savePoop':
+        return await savePoop(familyId, event, openid);
       case 'getTodaySummary':
         return await getTodaySummary(familyId, event.recordDate);
       case 'listRecords':
         return await listRecords(familyId, event, openid);
+      case 'resolveFileUrls':
+        return await resolveFileUrls(familyId, event, openid);
       default:
         return { success: false, message: '未知操作' };
     }
@@ -56,6 +60,7 @@ async function getRecord(familyId, recordDate, openid) {
     milkRecords: [],
     foodRecords: [],
     sleepRecords: [],
+    poopRecords: [],
     diary: '',
     diaryImages: []
   };
@@ -159,6 +164,24 @@ async function saveDiary(familyId, event, openid) {
   return { success: true, message: '心得已保存' };
 }
 
+/** 保存拉粑粑记录 */
+async function savePoop(familyId, event, openid) {
+  const { recordDate, poopRecords } = event;
+  const verify = await verifyFamilyMember(openid, familyId);
+  if (!verify.valid) return { success: false, message: verify.message };
+
+  const record = await getOrCreateRecord(familyId, recordDate, openid);
+  await db.collection('records').doc(record._id).update({
+    data: {
+      poopRecords: poopRecords || [],
+      creatorOpenid: openid,
+      updateTime: db.serverDate()
+    }
+  });
+
+  return { success: true, message: '拉粑粑记录已保存' };
+}
+
 /** 获取今日汇总 */
 async function getTodaySummary(familyId, recordDate) {
   const res = await db.collection('records')
@@ -170,7 +193,7 @@ async function getTodaySummary(familyId, recordDate) {
   if (!record) {
     return {
       success: true,
-      summary: { totalMilk: 0, foodGrams: 0, totalSleepMin: 0, breastMilk: 0, formulaMilk: 0 }
+      summary: { totalMilk: 0, foodGrams: 0, totalSleepMin: 0, breastMilk: 0, formulaMilk: 0, poopCount: 0 }
     };
   }
 
@@ -192,9 +215,11 @@ async function getTodaySummary(familyId, recordDate) {
     totalSleepMin += s.duration || calcSleepDuration(s.startTime, s.endTime);
   });
 
+  const poopCount = (record.poopRecords || []).length;
+
   return {
     success: true,
-    summary: { totalMilk, foodGrams, totalSleepMin, breastMilk, formulaMilk },
+    summary: { totalMilk, foodGrams, totalSleepMin, breastMilk, formulaMilk, poopCount },
     record
   };
 }
@@ -236,9 +261,62 @@ async function listRecords(familyId, event, openid) {
     milkRecords: r.milkRecords || [],
     foodRecords: r.foodRecords || [],
     sleepRecords: r.sleepRecords || [],
+    poopRecords: r.poopRecords || [],
     diary: r.diary || '',
     diaryImages: r.diaryImages || []
   }));
 
   return { success: true, records: simplified };
+}
+
+/** 从 fileID 提取云存储路径 */
+function extractCloudPath(fileID) {
+  const match = String(fileID).match(/^cloud:\/\/[^/]+\/(.+)$/);
+  return match ? match[1] : '';
+}
+
+/** 校验文件路径是否属于当前家庭 */
+function isFamilyStoragePath(cloudPath, familyId) {
+  return cloudPath.startsWith(`diary/${familyId}/`) || cloudPath.startsWith(`poop/${familyId}/`);
+}
+
+/** 云函数管理员权限换取临时链接，绕过客户端存储读权限限制 */
+async function resolveFileUrls(familyId, event, openid) {
+  const verify = await verifyFamilyMember(openid, familyId);
+  if (!verify.valid) return { success: false, message: verify.message };
+
+  const fileIds = (event.fileIds || []).map((id) => String(id));
+  if (fileIds.length === 0) return { success: true, urls: [] };
+
+  const allowedIds = [];
+  fileIds.forEach((fileID) => {
+    if (!fileID.startsWith('cloud://')) return;
+    const cloudPath = extractCloudPath(fileID);
+    if (isFamilyStoragePath(cloudPath, familyId)) {
+      allowedIds.push(fileID);
+    } else {
+      console.warn('拒绝访问非本家庭文件:', fileID);
+    }
+  });
+
+  const urlMap = {};
+  if (allowedIds.length > 0) {
+    const res = await cloud.getTempFileURL({
+      fileList: allowedIds.map((fileID) => ({ fileID, maxAge: 86400 }))
+    });
+    (res.fileList || []).forEach((item) => {
+      if (item.status === 0 && item.tempFileURL) {
+        urlMap[item.fileID] = item.tempFileURL;
+      } else {
+        console.warn('云图片无法访问:', item.fileID, item.errMsg);
+      }
+    });
+  }
+
+  const urls = fileIds.map((id) => {
+    if (!id.startsWith('cloud://')) return id;
+    return urlMap[id] || '';
+  });
+
+  return { success: true, urls };
 }

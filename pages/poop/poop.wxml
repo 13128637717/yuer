@@ -1,0 +1,64 @@
+<view class="container">
+  <view class="date-picker card" hover-class="card-hover">
+    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
+      <view class="date-display">
+        <text class="date-label">📅</text>
+        <text class="date-value">{{recordDate}}</text>
+        <text class="date-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
+    <view class="section-title">{{editingIndex >= 0 ? '编辑记录' : '添加记录'}}</view>
+    <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这条记录，保存后会更新列表</view>
+    <view class="form-group">
+      <text class="form-label">时间</text>
+      <time-picker value="{{formTime}}" bindchange="onTimeChange" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">状态</text>
+      <picker range="{{statusOptions}}" range-key="label" value="{{formStatusIndex}}" bindchange="onStatusChange">
+        <view class="form-input picker-value">{{statusOptions[formStatusIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-group">
+      <text class="form-label">状态图片（选填）</text>
+      <view class="image-section">
+        <view class="image-grid">
+          <view wx:if="{{formImage}}" class="image-item" hover-class="pressable-hover">
+            <image src="{{formImage}}" mode="aspectFill" data-url="{{formImage}}" bindtap="previewFormImage" />
+            <view class="image-remove" hover-class="pressable-hover" bindtap="removeFormImage">×</view>
+          </view>
+          <view wx:if="{{!formImage}}" class="image-add" hover-class="card-hover" bindtap="chooseImage">
+            <text class="add-icon">+</text>
+            <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <button class="btn-primary" hover-class="button-hover" bindtap="addOrUpdate" disabled="{{uploading}}">{{editingIndex >= 0 ? '更新记录' : '添加记录'}}</button>
+  </view>
+
+  <view class="list-card card poop-list fade-up">
+    <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{poopRecords.length}})</view>
+    <view wx:if="{{poopRecords.length === 0}}" class="empty-state">
+      <text class="empty-icon">💩</text>
+      <text class="empty-title">还没有拉粑粑记录</text>
+      <text class="empty-desc">添加第一条，方便追踪宝宝排便情况</text>
+    </view>
+    <view wx:for="{{poopRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
+      <view class="list-item-row">
+        <view class="list-item-left">
+          <view class="list-item-title">💩 {{item.time}} · {{item.statusText}}</view>
+          <view wx:if="{{item.image}}" class="list-item-desc">已附状态图</view>
+        </view>
+        <image wx:if="{{item.image}}" class="list-thumb" src="{{item.image}}" mode="aspectFill" data-url="{{item.image}}" data-index="{{index}}" bindtap="previewItemImage" />
+      </view>
+      <view class="list-item-actions">
+        <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>
+        <text class="action-btn danger" hover-class="pressable-hover" data-index="{{index}}" bindtap="deleteItem">删除</text>
+      </view>
+    </view>
+  </view>
+</view>

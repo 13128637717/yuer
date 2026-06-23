@@ -68,6 +68,10 @@
         <view class="quick-icon bubble-icon">📝</view>
         <view class="quick-text">写心得</view>
       </view>
+      <view class="quick-item card poop" hover-class="card-hover" bindtap="goPoop">
+        <view class="quick-icon bubble-icon">💩</view>
+        <view class="quick-text">记拉粑粑</view>
+      </view>
     </view>
   </block>
 </view>

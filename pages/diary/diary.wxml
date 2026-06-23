@@ -23,11 +23,11 @@
 
     <view class="image-section">
       <view class="image-grid">
-        <view wx:for="{{diaryImages}}" wx:key="index" class="image-item" hover-class="pressable-hover">
+        <view wx:for="{{diaryImageUrls}}" wx:key="index" class="image-item" hover-class="pressable-hover">
           <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
           <view class="image-remove" hover-class="pressable-hover" data-index="{{index}}" bindtap="removeImage">×</view>
         </view>
-        <view wx:if="{{diaryImages.length < 9}}" class="image-add" hover-class="card-hover" bindtap="chooseImage">
+        <view wx:if="{{diaryImageUrls.length < 9}}" class="image-add" hover-class="card-hover" bindtap="chooseImage">
           <text class="add-icon">+</text>
           <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
         </view>
@@ -49,7 +49,7 @@
       <view class="history-content">{{item.diary}}</view>
       <view wx:if="{{item.diaryImages.length > 0}}" class="history-images">
         <image
-          wx:for="{{item.diaryImages}}"
+          wx:for="{{item.diaryImageUrls}}"
           wx:for-item="img"
           wx:key="index"
           src="{{img}}"

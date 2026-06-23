@@ -1,6 +1,6 @@
 const { callFunction, getFamilyContext, ensureFamily, syncFamilyContext } = require('../../utils/cloud');
 const { today, formatDuration } = require('../../utils/date');
-const { MILK_TYPE_MAP } = require('../../utils/constants');
+const { MILK_TYPE_MAP, POOP_STATUS_MAP } = require('../../utils/constants');
 const { calcFoodGrams } = require('../../utils/record');
 
 Page({
@@ -10,10 +10,12 @@ Page({
     milkRecords: [],
     foodRecords: [],
     sleepRecords: [],
+    poopRecords: [],
     diary: '',
     totalMilk: 0,
     totalFoodGrams: 0,
-    totalSleepText: '0分钟'
+    totalSleepText: '0分钟',
+    poopCount: 0
   },
   onShow() {
     this.setData({ recordDate: today() });
@@ -38,10 +40,12 @@ Page({
         milkRecords: [],
         foodRecords: [],
         sleepRecords: [],
+        poopRecords: [],
         diary: '',
         totalMilk: 0,
         totalFoodGrams: 0,
-        totalSleepText: '0分钟'
+        totalSleepText: '0分钟',
+        poopCount: 0
       });
       return;
     }
@@ -59,6 +63,10 @@ Page({
       }));
 
       const foodRecords = record.foodRecords || [];
+      const poopRecords = (record.poopRecords || []).map((item) => ({
+        ...item,
+        statusText: POOP_STATUS_MAP[item.status] || item.status
+      }));
 
       let totalMilk = 0;
       milkRecords.forEach((m) => { totalMilk += m.amount || 0; });
@@ -72,10 +80,12 @@ Page({
         milkRecords,
         foodRecords,
         sleepRecords: record.sleepRecords || [],
+        poopRecords,
         diary: record.diary || '',
         totalMilk,
         totalFoodGrams,
-        totalSleepText: formatDuration(totalSleepMin)
+        totalSleepText: formatDuration(totalSleepMin),
+        poopCount: poopRecords.length
       });
     } catch (err) {
       console.error('加载记录失败:', err);
@@ -97,6 +107,10 @@ Page({
   async goDiary() {
     if (!(await ensureFamily())) return;
     wx.navigateTo({ url: `/pages/diary/diary?date=${this.data.recordDate}` });
+  },
+  async goPoop() {
+    if (!(await ensureFamily())) return;
+    wx.navigateTo({ url: `/pages/poop/poop?date=${this.data.recordDate}` });
   },
   goFamily() { wx.switchTab({ url: '/pages/family/family' }); }
 });

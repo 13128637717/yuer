@@ -44,6 +44,7 @@ exports.main = async (event, context) => {
       let formulaMilk = 0;
       let totalSleepMin = 0;
       let foodGrams = 0;
+      let poopCount = 0;
 
       if (record) {
         (record.milkRecords || []).forEach((m) => {
@@ -57,9 +58,10 @@ exports.main = async (event, context) => {
         (record.sleepRecords || []).forEach((s) => {
           totalSleepMin += s.duration || calcSleepDuration(s.startTime, s.endTime);
         });
+        poopCount = (record.poopRecords || []).length;
       }
 
-      return { date, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams };
+      return { date, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount };
     });
 
     return { success: true, stats };

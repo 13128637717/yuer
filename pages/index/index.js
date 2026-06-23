@@ -77,6 +77,11 @@ Page({
     wx.navigateTo({ url: '/pages/diary/diary' });
   },
 
+  async goPoop() {
+    if (!(await ensureFamily())) return;
+    wx.navigateTo({ url: '/pages/poop/poop' });
+  },
+
   goFamily() {
     wx.switchTab({ url: '/pages/family/family' });
   }

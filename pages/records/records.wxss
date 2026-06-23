@@ -18,6 +18,23 @@
   background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
 }
 
+.poop-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8EF 100%);
+}
+
+.poop-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.poop-thumb {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;

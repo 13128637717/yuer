@@ -36,6 +36,14 @@
       </view>
     </view>
 
+    <!-- 拉粑粑次数趋势图 -->
+    <view class="chart-card card poop-chart fade-up" hover-class="card-hover">
+      <view class="chart-title">💩 拉粑粑次数</view>
+      <view class="chart-container">
+        <ec-canvas id="poopChart" canvas-id="poopChart" ec="{{ecPoop}}"></ec-canvas>
+      </view>
+    </view>
+
     <view wx:if="{{loading}}" class="loading-hint">正在整理宝宝成长曲线...</view>
 
     <!-- 导出记录 -->
