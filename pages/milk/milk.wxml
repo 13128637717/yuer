@@ -15,9 +15,7 @@
     <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这条奶量记录，保存后会更新列表</view>
     <view class="form-group">
       <text class="form-label">时间</text>
-      <picker mode="time" value="{{formTime}}" bindchange="onTimeChange">
-        <view class="form-input picker-value">{{formTime || '选择时间'}}</view>
-      </picker>
+      <time-picker value="{{formTime}}" bindchange="onTimeChange" />
     </view>
     <view class="form-group">
       <text class="form-label">奶量 (ml)</text>

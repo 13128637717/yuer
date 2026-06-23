@@ -427,3 +427,134 @@ page {
     transform: translateY(-8rpx);
   }
 }
+
+/* time-picker 弹层（root-portal 渲染到页面根节点，样式需全局定义） */
+.tp-sheet-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 10000;
+  background: rgba(51, 51, 51, 0);
+  transition: background 0.28s ease;
+}
+
+.tp-sheet-mask-show {
+  background: rgba(51, 51, 51, 0.35);
+}
+
+.tp-sheet-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10001;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF8 100%);
+  border-radius: 30rpx 30rpx 0 0;
+  border-top: 2rpx solid rgba(255, 184, 173, 0.18);
+  box-shadow: 0 -10rpx 28rpx rgba(255, 154, 139, 0.14);
+  padding-bottom: env(safe-area-inset-bottom);
+  transform: translateY(100%);
+  transition: transform 0.32s ease-out;
+}
+
+.tp-sheet-panel-show {
+  transform: translateY(0);
+}
+
+.tp-sheet-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120rpx;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.tp-sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.tp-sheet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140rpx;
+  min-height: 72rpx;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+}
+
+.tp-sheet-btn-hover {
+  opacity: 0.72;
+}
+
+.tp-sheet-cancel-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #666666;
+  line-height: 1.4;
+}
+
+.tp-sheet-confirm {
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #FF9A8B 0%, #FFB8AD 100%);
+  box-shadow: 0 8rpx 18rpx rgba(255, 154, 139, 0.28);
+}
+
+.tp-sheet-confirm-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.4;
+}
+
+.tp-picker-wrap {
+  position: relative;
+  height: 400rpx;
+}
+
+.tp-picker-view {
+  width: 100%;
+  height: 400rpx;
+}
+
+.tp-picker-indicator {
+  height: 80rpx;
+  background: rgba(255, 245, 242, 0.55);
+  border-top: 2rpx solid rgba(255, 184, 173, 0.45);
+  border-bottom: 2rpx solid rgba(255, 184, 173, 0.45);
+  border-radius: 18rpx;
+}
+
+.tp-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 30rpx;
+  font-weight: 400;
+  color: #BBBBBB;
+}
+
+.tp-picker-item.is-selected {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #E87A6B;
+}
+
+.tp-picker-colon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #E87A6B;
+  pointer-events: none;
+  z-index: 2;
+}

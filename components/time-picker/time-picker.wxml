@@ -1,0 +1,63 @@
+<view class="time-picker">
+  <view
+    class="form-input picker-value trigger {{value ? '' : 'is-placeholder'}}"
+    hover-class="trigger-hover"
+    bindtap="openPicker"
+  >
+    {{value || placeholder}}
+  </view>
+
+  <root-portal enable="{{visible}}">
+    <block wx:if="{{visible}}">
+      <view
+        class="tp-sheet-mask {{animating ? 'tp-sheet-mask-show' : ''}}"
+        bindtap="onCancel"
+        catchtouchmove="noop"
+      />
+      <view
+        class="tp-sheet-panel {{animating ? 'tp-sheet-panel-show' : ''}}"
+        catchtouchmove="noop"
+      >
+        <view class="tp-sheet-toolbar">
+          <view class="tp-sheet-btn tp-sheet-cancel" hover-class="tp-sheet-btn-hover" bindtap="onCancel">
+            <text class="tp-sheet-cancel-text">取消</text>
+          </view>
+          <text class="tp-sheet-title">{{title}}</text>
+          <view class="tp-sheet-btn tp-sheet-confirm" hover-class="tp-sheet-btn-hover" bindtap="onConfirm">
+            <text class="tp-sheet-confirm-text">确定</text>
+          </view>
+        </view>
+        <view class="tp-picker-wrap">
+          <picker-view
+            class="tp-picker-view"
+            value="{{pickerValue}}"
+            immediate-change
+            indicator-class="tp-picker-indicator"
+            mask-style="background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0)), linear-gradient(0deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0));"
+            indicator-style="height: 80rpx;"
+            bindchange="onPickChange"
+            bindpickend="onPickEnd"
+          >
+            <picker-view-column>
+              <view
+                wx:for="{{hours}}"
+                wx:for-index="idx"
+                wx:key="key"
+                class="tp-picker-item {{activeHourIndex === idx ? 'is-selected' : ''}}"
+              >{{item.text}}</view>
+            </picker-view-column>
+            <picker-view-column>
+              <view
+                wx:for="{{minutes}}"
+                wx:for-index="idx"
+                wx:key="key"
+                class="tp-picker-item {{activeMinuteIndex === idx ? 'is-selected' : ''}}"
+              >{{item.text}}</view>
+            </picker-view-column>
+          </picker-view>
+          <text class="tp-picker-colon">:</text>
+        </view>
+      </view>
+    </block>
+  </root-portal>
+</view>

@@ -14,15 +14,11 @@
     <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这段睡眠记录，保存后会更新列表</view>
     <view class="form-group">
       <text class="form-label">入睡时间</text>
-      <picker mode="time" value="{{formStartTime}}" bindchange="onStartTimeChange">
-        <view class="form-input picker-value">{{formStartTime || '选择时间'}}</view>
-      </picker>
+      <time-picker value="{{formStartTime}}" bindchange="onStartTimeChange" />
     </view>
     <view class="form-group">
       <text class="form-label">起床时间</text>
-      <picker mode="time" value="{{formEndTime}}" bindchange="onEndTimeChange">
-        <view class="form-input picker-value">{{formEndTime || '选择时间'}}</view>
-      </picker>
+      <time-picker value="{{formEndTime}}" bindchange="onEndTimeChange" />
     </view>
     <view class="duration-display" wx:if="{{formDurationText}}">
       <text class="duration-icon">🌙</text>

@@ -1,0 +1,12 @@
+.time-picker {
+  width: 100%;
+}
+
+.trigger.is-placeholder {
+  color: var(--text-light);
+}
+
+.trigger-hover {
+  border-color: rgba(255, 154, 139, 0.42) !important;
+  background: rgba(255, 245, 242, 0.95) !important;
+}

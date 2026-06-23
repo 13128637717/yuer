@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "记睡眠"
+  "navigationBarTitleText": "记睡眠",
+  "usingComponents": {
+    "time-picker": "/components/time-picker/time-picker"
+  }
 }

@@ -145,9 +145,7 @@
       </view>
       <view class="form-group">
         <text class="form-label">推送时间</text>
-        <picker mode="time" value="{{notifyTime}}" bindchange="onNotifyTimeChange">
-          <view class="form-input picker-value">{{notifyTime}}</view>
-        </picker>
+        <time-picker value="{{notifyTime}}" bindchange="onNotifyTimeChange" />
       </view>
       <button class="btn-primary" hover-class="button-hover" bindtap="onSaveSettingsTap">保存设置</button>
       <button class="btn-secondary" style="margin-top:24rpx" hover-class="button-hover" bindtap="onTestNotifyTap">立即测试推送</button>

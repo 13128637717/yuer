@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "记奶量"
+  "navigationBarTitleText": "记奶量",
+  "usingComponents": {
+    "time-picker": "/components/time-picker/time-picker"
+  }
 }
