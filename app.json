@@ -10,10 +10,10 @@
     "pages/diary/diary"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#FF9A8B",
+    "navigationBarBackgroundColor": "#FFB8AD",
     "navigationBarTitleText": "宝宝成长助手",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#FFF8F0",
+    "backgroundColor": "#FFF2E8",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {

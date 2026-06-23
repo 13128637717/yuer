@@ -1,43 +1,21 @@
-.date-picker {
-  margin-bottom: 24rpx;
-}
-
-.date-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8rpx 0;
-}
-
-.date-label {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-}
-
-.date-value {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.date-arrow {
-  font-size: 20rpx;
-  color: var(--text-light);
-  margin-left: 12rpx;
-}
-
-.form-card, .list-card {
-  margin-bottom: 24rpx;
-}
-
-.picker-value {
-  color: var(--text-primary);
+.form-card,
+.sleep-list {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
 }
 
 .duration-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 28rpx;
-  color: var(--primary);
-  font-weight: 500;
+  color: var(--primary-dark);
+  font-weight: 700;
   margin-bottom: 24rpx;
-  text-align: center;
+  padding: 18rpx 22rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.duration-icon {
+  margin-right: 10rpx;
 }

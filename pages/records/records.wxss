@@ -1,33 +1,21 @@
-.date-picker {
-  margin-bottom: 24rpx;
-}
-
-.date-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8rpx 0;
-}
-
-.date-label {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-}
-
-.date-value {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.date-arrow {
-  font-size: 20rpx;
-  color: var(--text-light);
-  margin-left: 12rpx;
-}
-
 .section {
   margin-bottom: 24rpx;
+}
+
+.milk-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
+}
+
+.food-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8DF 100%);
+}
+
+.sleep-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
+}
+
+.diary-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
 }
 
 .section-header {
@@ -39,14 +27,22 @@
 
 .section-total {
   font-size: 26rpx;
-  color: var(--primary);
-  font-weight: 500;
+  color: var(--primary-dark);
+  font-weight: 700;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .empty-hint {
   font-size: 26rpx;
   color: var(--text-light);
-  padding: 16rpx 0;
+  padding: 20rpx 0;
+  text-align: center;
+}
+
+.empty-action {
+  margin-top: 32rpx;
 }
 
 .diary-preview {

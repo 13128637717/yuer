@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="date-picker card">
+  <view class="date-picker card" hover-class="card-hover">
     <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
       <view class="date-display">
         <text class="date-label">📅</text>
@@ -10,8 +10,9 @@
   </view>
 
   <!-- 录入表单 -->
-  <view class="form-card card">
+  <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
     <view class="section-title">{{editingIndex >= 0 ? '编辑奶量' : '添加奶量'}}</view>
+    <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这条奶量记录，保存后会更新列表</view>
     <view class="form-group">
       <text class="form-label">时间</text>
       <picker mode="time" value="{{formTime}}" bindchange="onTimeChange">
@@ -30,21 +31,25 @@
         <view class="form-input picker-value">{{typeOptions[formTypeIndex].label}}</view>
       </picker>
     </view>
-    <button class="btn-primary" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新' : '添加'}}</button>
+    <button class="btn-primary" hover-class="button-hover" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新奶量' : '添加奶量'}}</button>
   </view>
 
   <!-- 当天列表 -->
-  <view class="list-card card">
+  <view class="list-card card milk-list fade-up">
     <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{milkRecords.length}})</view>
-    <view wx:if="{{milkRecords.length === 0}}" class="empty-state">暂无记录</view>
-    <view wx:for="{{milkRecords}}" wx:key="index" class="list-item">
+    <view wx:if="{{milkRecords.length === 0}}" class="empty-state">
+      <text class="empty-icon">🍼</text>
+      <text class="empty-title">还没有奶量记录</text>
+      <text class="empty-desc">添加第一条，宝宝今天的补给就有迹可循啦</text>
+    </view>
+    <view wx:for="{{milkRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
       <view class="list-item-left">
-        <view class="list-item-title">{{item.time}} · {{item.typeText}}</view>
+        <view class="list-item-title">🍼 {{item.time}} · {{item.typeText}}</view>
         <view class="list-item-desc">{{item.amount}} ml</view>
       </view>
       <view class="list-item-actions">
-        <text class="action-btn" data-index="{{index}}" bindtap="editItem">编辑</text>
-        <text class="action-btn danger" data-index="{{index}}" bindtap="deleteItem">删除</text>
+        <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>
+        <text class="action-btn danger" hover-class="pressable-hover" data-index="{{index}}" bindtap="deleteItem">删除</text>
       </view>
     </view>
   </view>

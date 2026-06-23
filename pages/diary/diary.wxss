@@ -1,51 +1,25 @@
-.date-picker {
-  margin-bottom: 24rpx;
-}
-
-.date-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8rpx 0;
-}
-
-.date-label {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-}
-
-.date-value {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.date-arrow {
-  font-size: 20rpx;
-  color: var(--text-light);
-  margin-left: 12rpx;
-}
-
-.form-card {
-  margin-bottom: 24rpx;
+.diary-form,
+.history-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
 }
 
 .diary-textarea {
   width: 100%;
   min-height: 200rpx;
-  background: #FAFAFA;
+  background: rgba(255, 255, 255, 0.82);
   border: 2rpx solid var(--border);
-  border-radius: 16rpx;
+  border-radius: 22rpx;
   padding: 20rpx 24rpx;
   font-size: 28rpx;
   line-height: 1.6;
   box-sizing: border-box;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
 .char-count {
   text-align: right;
   font-size: 24rpx;
-  color: var(--text-light);
+  color: var(--primary-dark);
   margin: 8rpx 0 16rpx;
 }
 
@@ -63,8 +37,10 @@
   width: 160rpx;
   height: 160rpx;
   position: relative;
-  border-radius: 12rpx;
+  border-radius: 22rpx;
   overflow: hidden;
+  box-shadow: 0 8rpx 18rpx rgba(255, 154, 139, 0.12);
+  transition: transform 0.16s ease;
 }
 
 .image-item image {
@@ -74,47 +50,46 @@
 
 .image-remove {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 8rpx;
+  right: 8rpx;
   width: 40rpx;
   height: 40rpx;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 154, 139, 0.92);
   color: #FFF;
   font-size: 28rpx;
   text-align: center;
   line-height: 40rpx;
-  border-radius: 0 0 0 12rpx;
+  border-radius: 50%;
 }
 
 .image-add {
   width: 160rpx;
   height: 160rpx;
-  border: 2rpx dashed var(--border);
-  border-radius: 12rpx;
+  border: 2rpx dashed rgba(255, 154, 139, 0.42);
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.68);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: transform 0.16s ease, border-color 0.16s ease;
 }
 
 .add-icon {
   font-size: 48rpx;
-  color: var(--text-light);
+  color: var(--primary);
 }
 
 .add-text {
   font-size: 22rpx;
-  color: var(--text-light);
+  color: var(--primary-dark);
   margin-top: 8rpx;
 }
 
-.history-card {
-  margin-bottom: 24rpx;
-}
-
 .history-item {
-  padding: 24rpx 0;
+  padding: 24rpx 8rpx;
   border-bottom: 2rpx solid var(--border);
+  border-radius: 18rpx;
 }
 
 .history-item:last-child {
@@ -123,8 +98,8 @@
 
 .history-date {
   font-size: 26rpx;
-  color: var(--primary);
-  font-weight: 500;
+  color: var(--primary-dark);
+  font-weight: 700;
   margin-bottom: 12rpx;
 }
 
@@ -144,5 +119,6 @@
 .history-thumb {
   width: 120rpx;
   height: 120rpx;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 6rpx 14rpx rgba(255, 154, 139, 0.1);
 }

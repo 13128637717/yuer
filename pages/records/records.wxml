@@ -1,12 +1,14 @@
 <view class="container">
-  <view wx:if="{{!hasFamily}}" class="empty-state">
-    <text>请先创建或加入家庭</text>
-    <button class="btn-primary" style="margin-top:32rpx" bindtap="goFamily">去家庭页</button>
+  <view wx:if="{{!hasFamily}}" class="empty-state card fade-up">
+    <text class="empty-icon">👨‍👩‍👧</text>
+    <text class="empty-title">先加入一个家庭吧</text>
+    <text class="empty-desc">和家人一起记录宝宝的每个小进步</text>
+    <button class="btn-primary empty-action" hover-class="button-hover" bindtap="goFamily">去家庭页</button>
   </view>
 
   <block wx:else>
     <!-- 日期选择 -->
-    <view class="date-picker card">
+    <view class="date-picker card" hover-class="card-hover">
       <picker mode="date" value="{{recordDate}}" bindchange="onDateChange">
         <view class="date-display">
           <text class="date-label">📅</text>
@@ -17,59 +19,59 @@
     </view>
 
     <!-- 奶量区 -->
-    <view class="section card">
+    <view class="section card milk-section fade-up" hover-class="card-hover">
       <view class="section-header">
         <view class="section-title" style="margin-bottom:0">🍼 奶量记录</view>
         <view class="section-total">共 {{totalMilk}}ml</view>
       </view>
-      <view wx:if="{{milkRecords.length === 0}}" class="empty-hint">暂无记录</view>
-      <view wx:for="{{milkRecords}}" wx:key="index" class="list-item">
+      <view wx:if="{{milkRecords.length === 0}}" class="empty-hint">今天还没有奶量记录</view>
+      <view wx:for="{{milkRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
         <view class="list-item-left">
           <view class="list-item-title">{{item.time}} · {{item.typeText}}</view>
           <view class="list-item-desc">{{item.amount}} ml</view>
         </view>
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" bindtap="goMilk">添加/编辑奶量</button>
+      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goMilk">添加/编辑奶量</button>
     </view>
 
     <!-- 辅食区 -->
-    <view class="section card">
+    <view class="section card food-section fade-up" hover-class="card-hover">
       <view class="section-header">
         <view class="section-title" style="margin-bottom:0">🥣 辅食记录</view>
         <view class="section-total">共 {{totalFoodGrams}}g</view>
       </view>
-      <view wx:if="{{foodRecords.length === 0}}" class="empty-hint">暂无记录</view>
-      <view wx:for="{{foodRecords}}" wx:key="index" class="list-item">
+      <view wx:if="{{foodRecords.length === 0}}" class="empty-hint">今天还没有辅食记录</view>
+      <view wx:for="{{foodRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
         <view class="list-item-left">
           <view class="list-item-title">{{item.time}} · {{item.foodName}}</view>
           <view class="list-item-desc">{{item.amount}} {{item.unit}}</view>
         </view>
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" bindtap="goFood">添加/编辑辅食</button>
+      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goFood">添加/编辑辅食</button>
     </view>
 
     <!-- 睡眠区 -->
-    <view class="section card">
+    <view class="section card sleep-section fade-up" hover-class="card-hover">
       <view class="section-header">
         <view class="section-title" style="margin-bottom:0">😴 睡眠记录</view>
         <view class="section-total">{{totalSleepText}}</view>
       </view>
-      <view wx:if="{{sleepRecords.length === 0}}" class="empty-hint">暂无记录</view>
-      <view wx:for="{{sleepRecords}}" wx:key="index" class="list-item">
+      <view wx:if="{{sleepRecords.length === 0}}" class="empty-hint">今天还没有睡眠记录</view>
+      <view wx:for="{{sleepRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
         <view class="list-item-left">
           <view class="list-item-title">{{item.startTime}} - {{item.endTime}}</view>
           <view class="list-item-desc">时长约 {{item.duration}} 分钟</view>
         </view>
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" bindtap="goSleep">添加/编辑睡眠</button>
+      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goSleep">添加/编辑睡眠</button>
     </view>
 
     <!-- 心得区 -->
-    <view class="section card">
+    <view class="section card diary-section fade-up" hover-class="card-hover">
       <view class="section-title">📝 带娃心得</view>
-      <view wx:if="{{!diary}}" class="empty-hint">暂无心得</view>
+      <view wx:if="{{!diary}}" class="empty-hint">今天还没有写下小心得</view>
       <view wx:else class="diary-preview">{{diary}}</view>
-      <button class="btn-secondary" style="margin-top:16rpx" bindtap="goDiary">写心得</button>
+      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goDiary">写心得</button>
     </view>
   </block>
 </view>

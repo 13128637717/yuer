@@ -1,34 +1,42 @@
 .tabs {
-  display: flex;
-  padding: 8rpx;
   margin-bottom: 24rpx;
 }
 
 .tab-item {
-  flex: 1;
-  text-align: center;
-  padding: 16rpx 0;
   font-size: 28rpx;
-  color: var(--text-light);
-  border-radius: 16rpx;
-  transition: all 0.2s;
 }
 
 .tab-item.active {
-  background: var(--primary);
-  color: #FFFFFF;
-  font-weight: 500;
+  color: var(--primary-dark);
 }
 
 .chart-card {
   margin-bottom: 24rpx;
+  padding-bottom: 22rpx;
+}
+
+.milk-chart {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
+}
+
+.food-chart {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8DF 100%);
+}
+
+.sleep-chart {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
 }
 
 .chart-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.78);
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 16rpx;
+  margin-bottom: 18rpx;
 }
 
 .chart-container {
@@ -45,40 +53,28 @@ ec-canvas {
   text-align: center;
   font-size: 26rpx;
   color: var(--text-light);
-  padding: 16rpx;
+  padding: 20rpx;
+  animation: fadeUp 0.3s ease-out both;
 }
 
 .export-section {
   margin-bottom: 24rpx;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
 }
 
 .export-tabs {
-  display: flex;
-  padding: 8rpx;
   margin-bottom: 16rpx;
-  background: #FAFAFA;
-  border-radius: 16rpx;
 }
 
 .export-tab {
-  flex: 1;
-  text-align: center;
-  padding: 12rpx 0;
   font-size: 24rpx;
-  color: var(--text-light);
-  border-radius: 12rpx;
-}
-
-.export-tab.active {
-  background: var(--primary);
-  color: #FFFFFF;
-  font-weight: 500;
 }
 
 .export-text-wrap {
   height: 400rpx;
-  background: #FAFAFA;
-  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 2rpx solid rgba(255, 184, 173, 0.22);
+  border-radius: 22rpx;
   padding: 24rpx;
   box-sizing: border-box;
 }

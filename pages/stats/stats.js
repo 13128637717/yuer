@@ -12,12 +12,14 @@ function initMilkChart(canvas, width, height, dpr) {
   milkChart = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
   canvas.setChart(milkChart);
   milkChart.setOption({
-    color: ['#FF9A8B'],
+    color: ['#FF8F80'],
+    animationDuration: 650,
+    animationEasing: 'cubicOut',
     grid: { left: '12%', right: '5%', top: '15%', bottom: '15%' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10 } },
-    yAxis: { type: 'value', name: 'ml', axisLabel: { fontSize: 10 } },
-    series: [{ name: '总奶量', type: 'line', smooth: true, data: [], areaStyle: { opacity: 0.15 } }]
+    tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.96)', textStyle: { color: '#333333' } },
+    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10, color: '#999999' }, axisLine: { lineStyle: { color: '#F0E6DE' } } },
+    yAxis: { type: 'value', name: 'ml', axisLabel: { fontSize: 10, color: '#999999' }, splitLine: { lineStyle: { color: '#F7EAE3' } } },
+    series: [{ name: '总奶量', type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, data: [], areaStyle: { opacity: 0.18 } }]
   });
   return milkChart;
 }
@@ -27,11 +29,13 @@ function initSleepChart(canvas, width, height, dpr) {
   canvas.setChart(sleepChart);
   sleepChart.setOption({
     color: ['#7EC8A3'],
+    animationDuration: 650,
+    animationEasing: 'cubicOut',
     grid: { left: '12%', right: '5%', top: '15%', bottom: '15%' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10 } },
-    yAxis: { type: 'value', name: '小时', axisLabel: { fontSize: 10 } },
-    series: [{ name: '睡眠时长', type: 'line', smooth: true, data: [], areaStyle: { opacity: 0.15 } }]
+    tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.96)', textStyle: { color: '#333333' } },
+    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10, color: '#999999' }, axisLine: { lineStyle: { color: '#F0E6DE' } } },
+    yAxis: { type: 'value', name: '小时', axisLabel: { fontSize: 10, color: '#999999' }, splitLine: { lineStyle: { color: '#E4F6ED' } } },
+    series: [{ name: '睡眠时长', type: 'line', smooth: true, symbol: 'circle', symbolSize: 6, data: [], areaStyle: { opacity: 0.18 } }]
   });
   return sleepChart;
 }
@@ -41,11 +45,13 @@ function initFoodChart(canvas, width, height, dpr) {
   canvas.setChart(foodChart);
   foodChart.setOption({
     color: ['#FFB347'],
+    animationDuration: 650,
+    animationEasing: 'cubicOut',
     grid: { left: '12%', right: '5%', top: '15%', bottom: '15%' },
-    tooltip: { trigger: 'axis' },
-    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10 } },
-    yAxis: { type: 'value', name: 'g', axisLabel: { fontSize: 10 } },
-    series: [{ name: '辅食克数', type: 'bar', data: [], barMaxWidth: 24 }]
+    tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.96)', textStyle: { color: '#333333' } },
+    xAxis: { type: 'category', data: [], axisLabel: { fontSize: 10, color: '#999999' }, axisLine: { lineStyle: { color: '#F0E6DE' } } },
+    yAxis: { type: 'value', name: 'g', axisLabel: { fontSize: 10, color: '#999999' }, splitLine: { lineStyle: { color: '#FFF0CF' } } },
+    series: [{ name: '辅食克数', type: 'bar', data: [], barMaxWidth: 24, itemStyle: { borderRadius: [8, 8, 0, 0] } }]
   });
   return foodChart;
 }

@@ -1,5 +1,5 @@
 <view class="container">
-  <view class="date-picker card">
+  <view class="date-picker card" hover-class="card-hover">
     <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
       <view class="date-display">
         <text class="date-label">📅</text>
@@ -9,7 +9,7 @@
     </picker>
   </view>
 
-  <view class="form-card card">
+  <view class="form-card card diary-form fade-up">
     <view class="section-title">📝 {{isToday ? '今日' : recordDate}}心得</view>
     <textarea
       class="diary-textarea"
@@ -23,24 +23,28 @@
 
     <view class="image-section">
       <view class="image-grid">
-        <view wx:for="{{diaryImages}}" wx:key="index" class="image-item">
+        <view wx:for="{{diaryImages}}" wx:key="index" class="image-item" hover-class="pressable-hover">
           <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
-          <view class="image-remove" data-index="{{index}}" bindtap="removeImage">×</view>
+          <view class="image-remove" hover-class="pressable-hover" data-index="{{index}}" bindtap="removeImage">×</view>
         </view>
-        <view wx:if="{{diaryImages.length < 9}}" class="image-add" bindtap="chooseImage">
+        <view wx:if="{{diaryImages.length < 9}}" class="image-add" hover-class="card-hover" bindtap="chooseImage">
           <text class="add-icon">+</text>
           <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
         </view>
       </view>
     </view>
 
-    <button class="btn-primary" bindtap="save" disabled="{{uploading}}">保存心得</button>
+    <button class="btn-primary" hover-class="button-hover" bindtap="save" disabled="{{uploading}}">{{uploading ? '图片上传中...' : '保存心得'}}</button>
   </view>
 
-  <view class="history-card card">
+  <view class="history-card card fade-up">
     <view class="section-title">历史心得</view>
-    <view wx:if="{{historyList.length === 0}}" class="empty-state">暂无历史记录</view>
-    <view wx:for="{{historyList}}" wx:key="recordDate" class="history-item">
+    <view wx:if="{{historyList.length === 0}}" class="empty-state">
+      <text class="empty-icon">📖</text>
+      <text class="empty-title">还没有历史心得</text>
+      <text class="empty-desc">写下今天的小故事，之后就会出现在这里</text>
+    </view>
+    <view wx:for="{{historyList}}" wx:for-index="historyIndex" wx:key="recordDate" class="history-item" hover-class="list-item-hover">
       <view class="history-date">{{item.recordDate}}</view>
       <view class="history-content">{{item.diary}}</view>
       <view wx:if="{{item.diaryImages.length > 0}}" class="history-images">
@@ -51,6 +55,9 @@
           src="{{img}}"
           mode="aspectFill"
           class="history-thumb"
+          data-url="{{img}}"
+          data-history-index="{{historyIndex}}"
+          bindtap="previewHistoryImage"
         />
       </view>
     </view>

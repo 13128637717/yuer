@@ -1,109 +1,59 @@
 <view class="container">
-
-  <view class="date-picker card">
-
+  <view class="date-picker card" hover-class="card-hover">
     <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
-
       <view class="date-display">
-
         <text class="date-label">📅</text>
-
         <text class="date-value">{{recordDate}}</text>
-
         <text class="date-arrow">▼</text>
-
       </view>
-
     </picker>
-
   </view>
 
-
-
-  <view class="form-card card">
-
+  <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
     <view class="section-title">{{editingIndex >= 0 ? '编辑辅食' : '添加辅食'}}</view>
-
+    <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这条辅食记录，保存后会更新列表</view>
     <view class="form-group">
-
       <text class="form-label">时间</text>
-
       <picker mode="time" value="{{formTime}}" bindchange="onTimeChange">
-
         <view class="form-input picker-value">{{formTime || '选择时间'}}</view>
-
       </picker>
-
     </view>
-
     <view class="form-group">
-
       <text class="form-label">食物名称</text>
-
       <view class="form-input-wrap">
-
         <input class="form-input-field" placeholder="如：米糊、南瓜泥" value="{{formFoodName}}" bindinput="onFoodNameInput" />
-
       </view>
-
     </view>
-
     <view class="form-group">
-
       <text class="form-label">数量</text>
-
       <view class="amount-row">
-
         <view class="form-input-wrap amount-input">
-
           <input class="form-input-field" type="digit" placeholder="数量" value="{{formAmount}}" bindinput="onAmountInput" />
-
         </view>
-
         <picker range="{{unitOptions}}" range-key="label" value="{{formUnitIndex}}" bindchange="onUnitChange">
-
-          <view class="unit-picker">{{unitOptions[formUnitIndex].label}}</view>
-
+          <view class="unit-picker" hover-class="pressable-hover">{{unitOptions[formUnitIndex].label}}</view>
         </picker>
-
       </view>
-
     </view>
-
-    <button class="btn-primary" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新' : '添加'}}</button>
-
+    <button class="btn-primary" hover-class="button-hover" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新辅食' : '添加辅食'}}</button>
   </view>
 
-
-
-  <view class="list-card card">
-
+  <view class="list-card card food-list fade-up">
     <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{foodRecords.length}})</view>
-
-    <view wx:if="{{foodRecords.length === 0}}" class="empty-state">暂无记录</view>
-
-    <view wx:for="{{foodRecords}}" wx:key="index" class="list-item">
-
-      <view class="list-item-left">
-
-        <view class="list-item-title">{{item.time}} · {{item.foodName}}</view>
-
-        <view class="list-item-desc">{{item.amount}} {{item.unit}}</view>
-
-      </view>
-
-      <view class="list-item-actions">
-
-        <text class="action-btn" data-index="{{index}}" bindtap="editItem">编辑</text>
-
-        <text class="action-btn danger" data-index="{{index}}" bindtap="deleteItem">删除</text>
-
-      </view>
-
+    <view wx:if="{{foodRecords.length === 0}}" class="empty-state">
+      <text class="empty-icon">🥣</text>
+      <text class="empty-title">还没有辅食记录</text>
+      <text class="empty-desc">记录一口米糊、一勺果泥，成长变化会更清楚</text>
     </view>
-
+    <view wx:for="{{foodRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
+      <view class="list-item-left">
+        <view class="list-item-title">🥣 {{item.time}} · {{item.foodName}}</view>
+        <view class="list-item-desc">{{item.amount}} {{item.unit}}</view>
+      </view>
+      <view class="list-item-actions">
+        <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>
+        <text class="action-btn danger" hover-class="pressable-hover" data-index="{{index}}" bindtap="deleteItem">删除</text>
+      </view>
+    </view>
   </view>
-
 </view>
-
-

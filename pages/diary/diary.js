@@ -109,6 +109,15 @@ Page({
     });
   },
 
+  previewHistoryImage(e) {
+    const { url, historyIndex } = e.currentTarget.dataset;
+    const item = this.data.historyList[historyIndex];
+    wx.previewImage({
+      current: url,
+      urls: (item && item.diaryImages) || [url]
+    });
+  },
+
   async save() {
     const { diary, diaryImages, recordDate } = this.data;
     if (!diary.trim() && diaryImages.length === 0) {

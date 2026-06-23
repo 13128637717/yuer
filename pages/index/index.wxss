@@ -3,12 +3,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx 60rpx;
+  padding: 90rpx 44rpx;
+  margin-top: 80rpx;
+  text-align: center;
 }
 
 .no-family-icon {
-  font-size: 120rpx;
+  font-size: 118rpx;
   margin-bottom: 32rpx;
+  animation: floatSoft 2.8s ease-in-out infinite;
 }
 
 .no-family-title {
@@ -29,6 +32,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF0EA 56%, #FFE1EA 100%);
 }
 
 .baby-info {
@@ -37,8 +41,9 @@
 }
 
 .baby-avatar {
-  font-size: 80rpx;
+  font-size: 56rpx;
   margin-right: 24rpx;
+  animation: floatSoft 3s ease-in-out infinite;
 }
 
 .baby-name {
@@ -55,9 +60,12 @@
 
 .family-link {
   font-size: 26rpx;
-  color: var(--primary);
+  color: var(--primary-dark);
   display: flex;
   align-items: center;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .arrow {
@@ -76,6 +84,28 @@
   text-align: center;
   padding: 24rpx 16rpx;
   margin-bottom: 0;
+}
+
+.stat-card::after {
+  width: 88rpx;
+  height: 88rpx;
+}
+
+.milk-stat {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
+}
+
+.food-stat {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8DF 100%);
+}
+
+.sleep-stat {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
+}
+
+.stat-emoji {
+  font-size: 34rpx;
+  margin-bottom: 6rpx;
 }
 
 .stat-label {
@@ -104,8 +134,24 @@
   margin-bottom: 0;
 }
 
+.quick-item.milk {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
+}
+
+.quick-item.food {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8DF 100%);
+}
+
+.quick-item.sleep {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
+}
+
+.quick-item.diary {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F0FF 100%);
+}
+
 .quick-icon {
-  font-size: 64rpx;
+  font-size: 46rpx;
   margin-bottom: 16rpx;
 }
 
