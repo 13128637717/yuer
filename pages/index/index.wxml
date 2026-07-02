@@ -44,6 +44,25 @@
 
 
 
+    <view wx:if="{{sleepTimerActive}}" class="sleep-banner card fade-up">
+      <view class="sleep-banner-main" hover-class="sleep-banner-main-hover" bindtap="goSleep">
+        <image class="sleep-banner-icon" src="/images/icons/sleep.png" mode="aspectFit" />
+        <view class="sleep-banner-text">
+          <text class="sleep-banner-title">宝宝正在睡觉</text>
+          <text class="sleep-banner-elapsed">已睡 {{sleepTimerElapsed}}</text>
+        </view>
+      </view>
+      <view
+        class="sleep-banner-action"
+        hover-class="sleep-banner-action-hover"
+        catchtap="endSleepFromBanner"
+      >
+        <text class="sleep-banner-action-text">点击结束 ›</text>
+      </view>
+    </view>
+
+
+
     <view wx:if="{{yesterdayHint}}" class="yesterday-hint card fade-up" hover-class="card-hover" bindtap="goRecordsYesterday">
       <text class="yesterday-hint-text">{{yesterdayHint}}</text>
       <text class="yesterday-hint-arrow">去补记 ›</text>

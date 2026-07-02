@@ -30,7 +30,10 @@ Page({
     });
     this.calcDuration();
     this.loadSleepTimer();
-    this.loadRecords();
+    await this.loadRecords();
+    if (options && options.wakeUp === '1') {
+      await this.handlePendingWakeUp();
+    }
   },
 
   onShow() {
@@ -59,6 +62,18 @@ Page({
       }
     } catch (err) {
       this.setData({ sleepTimerActive: false, sleepTimerStart: '' });
+    }
+  },
+
+  async handlePendingWakeUp() {
+    try {
+      const timer = wx.getStorageSync(this.getTimerKey());
+      if (timer && timer.startTime && timer.recordDate === this.data.recordDate) {
+        this.setData({ sleepTimerActive: true, sleepTimerStart: timer.startTime });
+        await this.wakeUpFromTimer();
+      }
+    } catch (err) {
+      console.warn(err);
     }
   },
 
