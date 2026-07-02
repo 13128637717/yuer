@@ -167,6 +167,38 @@ async function getOrCreateRecord(familyId, recordDate, openid) {
   return { _id: addRes._id, ...newRecord };
 }
 
+function getMemberNickName(family, openid) {
+  if (!family || !family.members) return '家人';
+  const member = family.members.find((m) => m.openid === openid);
+  return (member && member.nickName) || '家人';
+}
+
+function buildRecordMeta(openid, family) {
+  return {
+    creatorOpenid: openid,
+    lastEditorOpenid: openid,
+    lastEditorNickName: getMemberNickName(family, openid),
+    updateTime: db.serverDate()
+  };
+}
+
+function stampRecords(records, openid, family) {
+  const nickName = getMemberNickName(family, openid);
+  return (records || []).map((item) => ({
+    ...item,
+    recordedBy: item.recordedBy || nickName
+  }));
+}
+
+function hasRecordData(record) {
+  const hasMilk = (record.milkRecords || []).length > 0;
+  const hasFood = (record.foodRecords || []).length > 0;
+  const hasSleep = (record.sleepRecords || []).length > 0;
+  const hasPoop = (record.poopRecords || []).length > 0;
+  const hasDiary = !!(record.diary && String(record.diary).trim()) || (record.diaryImages || []).length > 0;
+  return hasMilk || hasFood || hasSleep || hasPoop || hasDiary;
+}
+
 module.exports = {
   cloud,
   db,
@@ -180,5 +212,9 @@ module.exports = {
   resolveUserFamily,
   verifyFamilyMember,
   generateFamilyId,
-  getOrCreateRecord
+  getOrCreateRecord,
+  getMemberNickName,
+  buildRecordMeta,
+  stampRecords,
+  hasRecordData
 };

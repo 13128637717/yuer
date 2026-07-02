@@ -1,8 +1,9 @@
-const { callFunction, uploadImage, resolveCloudFileUrls, getFamilyContext, ensureFamily } = require('../../utils/cloud');
+const { callFunction, resolveCloudFileUrls, getFamilyContext, ensureFamily } = require('../../utils/cloud');
 const { today } = require('../../utils/date');
 
 Page({
   data: {
+    familyId: '',
     recordDate: '',
     todayDate: '',
     isToday: true,
@@ -15,8 +16,10 @@ Page({
 
   async onLoad(options) {
     if (!(await ensureFamily())) return;
+    const { familyId } = getFamilyContext();
     const recordDate = (options && options.date) || today();
     this.setData({
+      familyId,
       recordDate,
       todayDate: today(),
       isToday: recordDate === today()
@@ -72,53 +75,13 @@ Page({
     this.setData({ diary: e.detail.value });
   },
 
-  chooseImage() {
-    const remain = 9 - this.data.diaryImages.length;
-    if (remain <= 0) {
-      wx.showToast({ title: '最多上传9张图片', icon: 'none' });
-      return;
-    }
-    wx.chooseMedia({
-      count: remain,
-      mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      success: async (res) => {
-        this.setData({ uploading: true });
-        const { familyId } = getFamilyContext();
-        const newImages = [...this.data.diaryImages];
-        const newUrls = [...this.data.diaryImageUrls];
-
-        for (const file of res.tempFiles) {
-          const ext = file.tempFilePath.split('.').pop() || 'jpg';
-          const cloudPath = `diary/${familyId}/${this.data.recordDate}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-          try {
-            const fileID = await uploadImage(file.tempFilePath, cloudPath);
-            const [url] = await resolveCloudFileUrls([fileID]);
-            newImages.push(fileID);
-            newUrls.push(url);
-          } catch (err) {
-            console.error('上传失败:', err);
-          }
-        }
-
-        this.setData({ diaryImages: newImages, diaryImageUrls: newUrls, uploading: false });
-      }
-    });
+  onImageUploaderChange(e) {
+    const { fileIds, imageUrls } = e.detail;
+    this.setData({ diaryImages: fileIds, diaryImageUrls: imageUrls });
   },
 
-  removeImage(e) {
-    const idx = e.currentTarget.dataset.index;
-    const newImages = this.data.diaryImages.filter((_, i) => i !== idx);
-    const newUrls = this.data.diaryImageUrls.filter((_, i) => i !== idx);
-    this.setData({ diaryImages: newImages, diaryImageUrls: newUrls });
-  },
-
-  previewImage(e) {
-    const url = e.currentTarget.dataset.url;
-    wx.previewImage({
-      current: url,
-      urls: this.data.diaryImageUrls
-    });
+  onImageUploading(e) {
+    this.setData({ uploading: e.detail.uploading });
   },
 
   previewHistoryImage(e) {

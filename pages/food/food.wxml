@@ -1,13 +1,5 @@
 <view class="container">
-  <view class="date-picker card" hover-class="card-hover">
-    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
-      <view class="date-display">
-        <text class="date-label">📅</text>
-        <text class="date-value">{{recordDate}}</text>
-        <text class="date-arrow">▼</text>
-      </view>
-    </picker>
-  </view>
+  <date-picker-card recordDate="{{recordDate}}" todayDate="{{todayDate}}" bindchange="onDateChange" />
 
   <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
     <view class="section-title">{{editingIndex >= 0 ? '编辑辅食' : '添加辅食'}}</view>
@@ -18,6 +10,16 @@
     </view>
     <view class="form-group">
       <text class="form-label">食物名称</text>
+      <view wx:if="{{recentFoodNames.length > 0 && editingIndex < 0}}" class="recent-chips">
+        <view
+          wx:for="{{recentFoodNames}}"
+          wx:key="*this"
+          class="recent-chip"
+          data-name="{{item}}"
+          hover-class="pressable-hover"
+          bindtap="pickRecentFood"
+        >{{item}}</view>
+      </view>
       <view class="form-input-wrap">
         <input class="form-input-field" placeholder="如：米糊、南瓜泥" value="{{formFoodName}}" bindinput="onFoodNameInput" />
       </view>
@@ -39,14 +41,14 @@
   <view class="list-card card food-list fade-up">
     <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{foodRecords.length}})</view>
     <view wx:if="{{foodRecords.length === 0}}" class="empty-state">
-      <text class="empty-icon">🥣</text>
+      <image class="empty-img" src="/images/illustrations/empty-record.png" mode="aspectFit" />
       <text class="empty-title">还没有辅食记录</text>
       <text class="empty-desc">记录一口米糊、一勺果泥，成长变化会更清楚</text>
     </view>
     <view wx:for="{{foodRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
       <view class="list-item-left">
         <view class="list-item-title">🥣 {{item.time}} · {{item.foodName}}</view>
-        <view class="list-item-desc">{{item.amount}} {{item.unit}}</view>
+        <view class="list-item-desc">{{item.amount}} {{item.unit}}{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
       </view>
       <view class="list-item-actions">
         <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>

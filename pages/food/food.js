@@ -1,6 +1,7 @@
 const { callFunction, ensureFamily } = require('../../utils/cloud');
 
 const { today, nowTime } = require('../../utils/date');
+const { getRecentFoodNames, saveRecentFoodName } = require('../../utils/recent');
 
 
 
@@ -34,7 +35,9 @@ Page({
 
     ],
 
-    editingIndex: -1
+    editingIndex: -1,
+
+    recentFoodNames: []
 
   },
 
@@ -54,7 +57,9 @@ Page({
 
       isToday: recordDate === today(),
 
-      formTime: nowTime()
+      formTime: nowTime(),
+
+      recentFoodNames: getRecentFoodNames()
 
     });
 
@@ -116,6 +121,11 @@ Page({
 
 
 
+  pickRecentFood(e) {
+    const name = e.currentTarget.dataset.name;
+    this.setData({ formFoodName: name });
+  },
+
   async addOrUpdate() {
 
     const { formTime, formFoodName, formAmount, formUnit, foodRecords, editingIndex } = this.data;
@@ -140,7 +150,13 @@ Page({
 
 
 
-    const item = { time: formTime, foodName: formFoodName, amount, unit: formUnit };
+    const item = {
+      time: formTime,
+      foodName: formFoodName,
+      amount,
+      unit: formUnit,
+      recordedBy: editingIndex >= 0 ? foodRecords[editingIndex].recordedBy : ''
+    };
 
     let newList = [...foodRecords];
 
@@ -158,6 +174,8 @@ Page({
 
 
 
+    saveRecentFoodName(formFoodName);
+
     this.setData({
 
       foodRecords: newList,
@@ -168,7 +186,9 @@ Page({
 
       formTime: nowTime(),
 
-      editingIndex: -1
+      editingIndex: -1,
+
+      recentFoodNames: getRecentFoodNames()
 
     });
 
@@ -210,15 +230,18 @@ Page({
 
     const idx = e.currentTarget.dataset.index;
 
-    this.setData({
-
-      foodRecords: this.data.foodRecords.filter((_, i) => i !== idx),
-
-      editingIndex: -1
-
+    wx.showModal({
+      title: '确认删除',
+      content: '确定删除这条辅食记录吗？',
+      success: async (res) => {
+        if (!res.confirm) return;
+        this.setData({
+          foodRecords: this.data.foodRecords.filter((_, i) => i !== idx),
+          editingIndex: -1
+        });
+        await this.persistRecords();
+      }
     });
-
-    await this.persistRecords();
 
   },
 
@@ -236,7 +259,9 @@ Page({
 
         recordDate: this.data.recordDate,
 
-        foodRecords: this.data.foodRecords
+        foodRecords: this.data.foodRecords.map(({ time, foodName, amount, unit, recordedBy }) => ({
+          time, foodName, amount, unit, recordedBy
+        }))
 
       });
 

@@ -1,65 +1,56 @@
-<view class="container">
-  <view class="date-picker card" hover-class="card-hover">
-    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
-      <view class="date-display">
-        <text class="date-label">📅</text>
-        <text class="date-value">{{recordDate}}</text>
-        <text class="date-arrow">▼</text>
-      </view>
-    </picker>
-  </view>
-
-  <view class="form-card card diary-form fade-up">
-    <view class="section-title">📝 {{isToday ? '今日' : recordDate}}心得</view>
-    <textarea
-      class="diary-textarea"
-      placeholder="记录带娃心得、宝宝趣事..."
-      value="{{diary}}"
-      bindinput="onDiaryInput"
-      maxlength="2000"
-      auto-height
-    />
-    <view class="char-count">{{diary.length}}/2000</view>
-
-    <view class="image-section">
-      <view class="image-grid">
-        <view wx:for="{{diaryImageUrls}}" wx:key="index" class="image-item" hover-class="pressable-hover">
-          <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
-          <view class="image-remove" hover-class="pressable-hover" data-index="{{index}}" bindtap="removeImage">×</view>
-        </view>
-        <view wx:if="{{diaryImageUrls.length < 9}}" class="image-add" hover-class="card-hover" bindtap="chooseImage">
-          <text class="add-icon">+</text>
-          <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
-        </view>
-      </view>
-    </view>
-
-    <button class="btn-primary" hover-class="button-hover" bindtap="save" disabled="{{uploading}}">{{uploading ? '图片上传中...' : '保存心得'}}</button>
-  </view>
-
-  <view class="history-card card fade-up">
-    <view class="section-title">历史心得</view>
-    <view wx:if="{{historyList.length === 0}}" class="empty-state">
-      <text class="empty-icon">📖</text>
-      <text class="empty-title">还没有历史心得</text>
-      <text class="empty-desc">写下今天的小故事，之后就会出现在这里</text>
-    </view>
-    <view wx:for="{{historyList}}" wx:for-index="historyIndex" wx:key="recordDate" class="history-item" hover-class="list-item-hover">
-      <view class="history-date">{{item.recordDate}}</view>
-      <view class="history-content">{{item.diary}}</view>
-      <view wx:if="{{item.diaryImages.length > 0}}" class="history-images">
-        <image
-          wx:for="{{item.diaryImageUrls}}"
-          wx:for-item="img"
-          wx:key="index"
-          src="{{img}}"
-          mode="aspectFill"
-          class="history-thumb"
-          data-url="{{img}}"
-          data-history-index="{{historyIndex}}"
-          bindtap="previewHistoryImage"
-        />
-      </view>
-    </view>
-  </view>
-</view>
+<view class="container">
+  <date-picker-card recordDate="{{recordDate}}" todayDate="{{todayDate}}" bindchange="onDateChange" />
+
+  <view class="form-card card diary-form fade-up">
+    <view class="section-title">📝 {{isToday ? '今日' : recordDate}}心得</view>
+    <textarea
+      class="diary-textarea"
+      placeholder="记录带娃心得、宝宝趣事..."
+      value="{{diary}}"
+      bindinput="onDiaryInput"
+      maxlength="2000"
+      auto-height
+    />
+    <view class="char-count">{{diary.length}}/2000</view>
+
+    <view class="image-section">
+      <image-uploader
+        maxCount="{{9}}"
+        fileIds="{{diaryImages}}"
+        imageUrls="{{diaryImageUrls}}"
+        cloudPathPrefix="diary/{{familyId}}/{{recordDate}}"
+        bindchange="onImageUploaderChange"
+        binduploading="onImageUploading"
+      />
+    </view>
+
+    <button class="btn-primary" hover-class="button-hover" bindtap="save" disabled="{{uploading}}">{{uploading ? '图片上传中...' : '保存心得'}}</button>
+  </view>
+
+  <view class="history-card card fade-up">
+    <view class="section-title">历史心得</view>
+    <view wx:if="{{historyList.length === 0}}" class="empty-state">
+      <image class="empty-img" src="/images/illustrations/empty-record.png" mode="aspectFit" />
+      <text class="empty-title">还没有历史心得</text>
+      <text class="empty-desc">写下今天的小故事，之后就会出现在这里</text>
+    </view>
+    <view wx:for="{{historyList}}" wx:for-index="historyIndex" wx:key="recordDate" class="history-item" hover-class="list-item-hover">
+      <view class="history-date">{{item.recordDate}}</view>
+      <view class="history-content">{{item.diary}}</view>
+      <view wx:if="{{item.diaryImages.length > 0}}" class="history-images">
+        <image
+          wx:for="{{item.diaryImageUrls}}"
+          wx:for-item="img"
+          wx:key="index"
+          src="{{img}}"
+          mode="aspectFill"
+          class="history-thumb"
+          data-url="{{img}}"
+          data-history-index="{{historyIndex}}"
+          bindtap="previewHistoryImage"
+        />
+      </view>
+    </view>
+  </view>
+</view>
+

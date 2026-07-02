@@ -1,13 +1,5 @@
 <view class="container">
-  <view class="date-picker card" hover-class="card-hover">
-    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
-      <view class="date-display">
-        <text class="date-label">📅</text>
-        <text class="date-value">{{recordDate}}</text>
-        <text class="date-arrow">▼</text>
-      </view>
-    </picker>
-  </view>
+  <date-picker-card recordDate="{{recordDate}}" todayDate="{{todayDate}}" bindchange="onDateChange" />
 
   <!-- 录入表单 -->
   <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
@@ -29,6 +21,9 @@
         <view class="form-input picker-value">{{typeOptions[formTypeIndex].label}}</view>
       </picker>
     </view>
+    <view wx:if="{{recentPref && editingIndex < 0}}" class="recent-pref" hover-class="pressable-hover" bindtap="applyRecentPref">
+      <text>复用上次：{{recentPref.amount}}ml · {{recentPref.type === 'breast' ? '母乳' : '配方奶'}}</text>
+    </view>
     <button class="btn-primary" hover-class="button-hover" bindtap="addOrUpdate">{{editingIndex >= 0 ? '更新奶量' : '添加奶量'}}</button>
   </view>
 
@@ -36,14 +31,14 @@
   <view class="list-card card milk-list fade-up">
     <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{milkRecords.length}})</view>
     <view wx:if="{{milkRecords.length === 0}}" class="empty-state">
-      <text class="empty-icon">🍼</text>
+      <image class="empty-img" src="/images/illustrations/empty-record.png" mode="aspectFit" />
       <text class="empty-title">还没有奶量记录</text>
       <text class="empty-desc">添加第一条，宝宝今天的补给就有迹可循啦</text>
     </view>
     <view wx:for="{{milkRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
       <view class="list-item-left">
         <view class="list-item-title">🍼 {{item.time}} · {{item.typeText}}</view>
-        <view class="list-item-desc">{{item.amount}} ml</view>
+        <view class="list-item-desc">{{item.amount}} ml{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
       </view>
       <view class="list-item-actions">
         <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>

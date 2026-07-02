@@ -20,7 +20,7 @@ page {
   --card-shadow: 0 10rpx 28rpx rgba(255, 154, 139, 0.14);
   --card-shadow-active: 0 16rpx 36rpx rgba(255, 154, 139, 0.2);
 
-  background: linear-gradient(180deg, #FFF2E8 0%, var(--bg) 42%, #FFFDF8 100%);
+  background: var(--bg);
   color: var(--text-primary);
   font-size: 28rpx;
   box-sizing: border-box;
@@ -92,6 +92,9 @@ page {
 
 /* 主按钮 */
 .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   color: #FFFFFF;
   border: none;
@@ -100,7 +103,9 @@ page {
   font-weight: 500;
   padding: 20rpx 0;
   width: 100%;
+  min-height: 90rpx;
   line-height: 1.5;
+  box-sizing: border-box;
   box-shadow: 0 10rpx 22rpx rgba(255, 154, 139, 0.28);
   transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease;
 }
@@ -116,14 +121,25 @@ page {
 
 /* 次要按钮 */
 .btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.92);
   color: var(--primary);
   border: 2rpx solid var(--primary);
   border-radius: 48rpx;
-  font-size: 28rpx;
-  padding: 16rpx 0;
+  font-size: 30rpx;
+  font-weight: 500;
+  padding: 18rpx 0;
   width: 100%;
+  min-height: 90rpx;
+  line-height: 1.5;
+  box-sizing: border-box;
   transition: transform 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+}
+
+.btn-stack-gap {
+  margin-top: 24rpx;
 }
 
 .btn-secondary::after {
@@ -400,22 +416,18 @@ page {
 @keyframes pageFadeIn {
   from {
     opacity: 0;
-    transform: translateY(12rpx);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(20rpx);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

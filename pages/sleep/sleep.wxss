@@ -1,3 +1,31 @@
+.timer-card {
+  margin-bottom: 24rpx;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);
+}
+
+.timer-active {
+  text-align: center;
+}
+
+.timer-desc {
+  font-size: 26rpx;
+  color: var(--text-light);
+  margin-bottom: 24rpx;
+}
+
+.timer-start {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 24rpx 0 32rpx;
+}
+
+.empty-img {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 16rpx;
+}
+
 .form-card,
 .sleep-list {
   background: linear-gradient(180deg, #FFFFFF 0%, #F0FFF7 100%);

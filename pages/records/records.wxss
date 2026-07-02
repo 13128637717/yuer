@@ -2,6 +2,109 @@
   margin-bottom: 24rpx;
 }
 
+.marked-dates {
+  margin-bottom: 20rpx;
+  padding: 20rpx 24rpx;
+}
+
+.marked-dates-title {
+  font-size: 24rpx;
+  color: var(--text-light);
+  margin-bottom: 12rpx;
+}
+
+.marked-dates-scroll {
+  white-space: nowrap;
+}
+
+.marked-date-chip {
+  display: inline-block;
+  padding: 10rpx 20rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  background: #FFF4F1;
+  color: var(--text-primary);
+}
+
+.marked-date-chip.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.last-editor-hint {
+  font-size: 24rpx;
+  color: var(--text-light);
+  margin-bottom: 16rpx;
+  padding: 0 8rpx;
+}
+
+.yesterday-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  margin-bottom: 20rpx;
+  background: linear-gradient(135deg, #FFF8F4 0%, #FFE8E0 100%);
+}
+
+.yesterday-hint-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.yesterday-hint-arrow {
+  font-size: 26rpx;
+  color: var(--primary);
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 24rpx;
+}
+
+.date-nav date-picker-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.date-nav-btn {
+  font-size: 24rpx;
+  color: var(--primary-dark);
+  padding: 12rpx 8rpx;
+  white-space: nowrap;
+}
+
+.date-nav .date-picker {
+  margin-bottom: 0;
+}
+
+.empty-img {
+  width: 180rpx;
+  height: 180rpx;
+  margin-bottom: 24rpx;
+}
+
+.diary-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.diary-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+}
+
 .milk-section {
   background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
 }
@@ -33,22 +136,6 @@
   height: 80rpx;
   border-radius: 12rpx;
   flex-shrink: 0;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16rpx;
-}
-
-.section-total {
-  font-size: 26rpx;
-  color: var(--primary-dark);
-  font-weight: 700;
-  padding: 8rpx 16rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.78);
 }
 
 .empty-hint {

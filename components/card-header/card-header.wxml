@@ -1,0 +1,8 @@
+<view class="section-header">
+  <view class="section-title-row">
+    <image wx:if="{{icon}}" class="section-icon" src="{{icon}}" mode="aspectFit" />
+    <text wx:else class="section-emoji">{{title}}</text>
+    <text wx:if="{{icon}}" class="section-title-text">{{title}}</text>
+  </view>
+  <view wx:if="{{total}}" class="section-total">{{total}}</view>
+</view>

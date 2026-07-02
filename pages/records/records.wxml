@@ -1,94 +1,211 @@
 <view class="container">
+
   <view wx:if="{{!hasFamily}}" class="empty-state card fade-up">
-    <text class="empty-icon">👨‍👩‍👧</text>
+
+    <image class="empty-img" src="/images/illustrations/empty-family.png" mode="aspectFit" />
+
     <text class="empty-title">先加入一个家庭吧</text>
+
     <text class="empty-desc">和家人一起记录宝宝的每个小进步</text>
+
     <button class="btn-primary empty-action" hover-class="button-hover" bindtap="goFamily">去家庭页</button>
+
   </view>
 
+
+
   <block wx:else>
-    <!-- 日期选择 -->
-    <view class="date-picker card" hover-class="card-hover">
-      <picker mode="date" value="{{recordDate}}" bindchange="onDateChange">
-        <view class="date-display">
-          <text class="date-label">📅</text>
-          <text class="date-value">{{recordDate}}</text>
-          <text class="date-arrow">▼</text>
-        </view>
-      </picker>
+
+    <view class="date-nav card fade-up">
+
+      <view class="date-nav-btn" data-delta="-1" hover-class="pressable-hover" bindtap="shiftDate">‹ 前一天</view>
+
+      <date-picker-card
+
+        recordDate="{{recordDate}}"
+
+        todayDate="{{todayDate}}"
+
+        limitFuture="{{true}}"
+
+        bindchange="onDateChange"
+
+      />
+
+      <view class="date-nav-btn" data-delta="1" hover-class="pressable-hover" bindtap="shiftDate">后一天 ›</view>
+
     </view>
 
-    <!-- 奶量区 -->
+
+
+    <view wx:if="{{markedDates.length > 0}}" class="marked-dates card fade-up">
+      <view class="marked-dates-title">近30天有记录的日期</view>
+      <scroll-view class="marked-dates-scroll" scroll-x="{{true}}">
+        <view
+          wx:for="{{markedDates}}"
+          wx:key="*this"
+          class="marked-date-chip {{item === recordDate ? 'active' : ''}}"
+          data-date="{{item}}"
+          hover-class="pressable-hover"
+          bindtap="jumpToDate"
+        >{{item}}</view>
+      </scroll-view>
+    </view>
+
+    <view wx:if="{{yesterdayHint}}" class="yesterday-hint card fade-up" hover-class="card-hover" bindtap="jumpToYesterday">
+      <text class="yesterday-hint-text">{{yesterdayHint}}</text>
+      <text class="yesterday-hint-arrow">去补记 ›</text>
+    </view>
+
+    <view wx:if="{{lastEditorText}}" class="last-editor-hint">{{lastEditorText}}</view>
+
     <view class="section card milk-section fade-up" hover-class="card-hover">
-      <view class="section-header">
-        <view class="section-title" style="margin-bottom:0">🍼 奶量记录</view>
-        <view class="section-total">共 {{totalMilk}}ml</view>
-      </view>
+
+      <card-header title="奶量记录" icon="/images/icons/milk.png" total="共 {{totalMilk}}ml" />
+
       <view wx:if="{{milkRecords.length === 0}}" class="empty-hint">今天还没有奶量记录</view>
+
       <view wx:for="{{milkRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
+
         <view class="list-item-left">
+
           <view class="list-item-title">{{item.time}} · {{item.typeText}}</view>
-          <view class="list-item-desc">{{item.amount}} ml</view>
+
+          <view class="list-item-desc">{{item.amount}} ml{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
+
         </view>
+
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goMilk">添加/编辑奶量</button>
+
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="goMilk">添加/编辑奶量</button>
+
     </view>
 
-    <!-- 辅食区 -->
+
+
     <view class="section card food-section fade-up" hover-class="card-hover">
-      <view class="section-header">
-        <view class="section-title" style="margin-bottom:0">🥣 辅食记录</view>
-        <view class="section-total">共 {{totalFoodGrams}}g</view>
-      </view>
+
+      <card-header title="辅食记录" icon="/images/icons/food.png" total="共 {{foodTotalText}}" />
+
       <view wx:if="{{foodRecords.length === 0}}" class="empty-hint">今天还没有辅食记录</view>
+
       <view wx:for="{{foodRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
+
         <view class="list-item-left">
+
           <view class="list-item-title">{{item.time}} · {{item.foodName}}</view>
-          <view class="list-item-desc">{{item.amount}} {{item.unit}}</view>
+
+          <view class="list-item-desc">{{item.amount}} {{item.unit}}{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
+
         </view>
+
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goFood">添加/编辑辅食</button>
+
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="goFood">添加/编辑辅食</button>
+
     </view>
 
-    <!-- 睡眠区 -->
+
+
     <view class="section card sleep-section fade-up" hover-class="card-hover">
-      <view class="section-header">
-        <view class="section-title" style="margin-bottom:0">😴 睡眠记录</view>
-        <view class="section-total">{{totalSleepText}}</view>
-      </view>
+
+      <card-header title="睡眠记录" icon="/images/icons/sleep.png" total="{{totalSleepText}}" />
+
       <view wx:if="{{sleepRecords.length === 0}}" class="empty-hint">今天还没有睡眠记录</view>
+
       <view wx:for="{{sleepRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
+
         <view class="list-item-left">
+
           <view class="list-item-title">{{item.startTime}} - {{item.endTime}}</view>
-          <view class="list-item-desc">时长约 {{item.duration}} 分钟</view>
+
+          <view class="list-item-desc">时长约 {{item.durationText}}{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
+
         </view>
+
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goSleep">添加/编辑睡眠</button>
+
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="goSleep">添加/编辑睡眠</button>
+
     </view>
 
-    <!-- 拉粑粑区 -->
+
+
     <view class="section card poop-section fade-up" hover-class="card-hover">
-      <view class="section-header">
-        <view class="section-title" style="margin-bottom:0">💩 拉粑粑记录</view>
-        <view class="section-total">共 {{poopCount}} 次</view>
-      </view>
+
+      <card-header title="拉粑粑记录" icon="/images/icons/poop.png" total="共 {{poopCount}} 次" />
+
       <view wx:if="{{poopRecords.length === 0}}" class="empty-hint">今天还没有拉粑粑记录</view>
+
       <view wx:for="{{poopRecords}}" wx:key="index" class="list-item poop-list-item" hover-class="list-item-hover">
+
         <view class="list-item-left">
+
           <view class="list-item-title">{{item.time}} · {{item.statusText}}</view>
-          <view wx:if="{{item.image}}" class="list-item-desc">已附状态图</view>
+
+          <view class="list-item-desc">{{item.recordedBy ? item.recordedBy : ''}}{{item.recordedBy && item.imageUrl ? ' · ' : ''}}{{item.imageUrl ? '已附状态图' : ''}}</view>
+
         </view>
-        <image wx:if="{{item.image}}" class="poop-thumb" src="{{item.image}}" mode="aspectFill" />
+
+        <image
+
+          wx:if="{{item.imageUrl}}"
+
+          class="poop-thumb"
+
+          src="{{item.imageUrl}}"
+
+          mode="aspectFill"
+
+          data-url="{{item.imageUrl}}"
+
+          bindtap="previewPoopImage"
+
+        />
+
       </view>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goPoop">添加/编辑拉粑粑</button>
+
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="goPoop">添加/编辑拉粑粑</button>
+
     </view>
 
-    <!-- 心得区 -->
+
+
     <view class="section card diary-section fade-up" hover-class="card-hover">
-      <view class="section-title">📝 带娃心得</view>
-      <view wx:if="{{!diary}}" class="empty-hint">今天还没有写下小心得</view>
-      <view wx:else class="diary-preview">{{diary}}</view>
-      <button class="btn-secondary" style="margin-top:16rpx" hover-class="button-hover" bindtap="goDiary">写心得</button>
+
+      <card-header title="带娃心得" icon="/images/icons/diary.png" />
+
+      <view wx:if="{{!diary && diaryImageUrls.length === 0}}" class="empty-hint">今天还没有写下小心得</view>
+
+      <view wx:if="{{diary}}" class="diary-preview">{{diary}}</view>
+
+      <view wx:if="{{diaryImageUrls.length > 0}}" class="diary-images">
+
+        <image
+
+          wx:for="{{diaryImageUrls}}"
+
+          wx:key="index"
+
+          class="diary-thumb"
+
+          src="{{item}}"
+
+          mode="aspectFill"
+
+          data-index="{{index}}"
+
+          bindtap="previewDiaryImage"
+
+        />
+
+      </view>
+
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="goDiary">写心得</button>
+
     </view>
+
   </block>
+
 </view>
+

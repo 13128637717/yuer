@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "记拉粑粑",
   "usingComponents": {
-    "time-picker": "/components/time-picker/time-picker"
+    "time-picker": "/components/time-picker/time-picker",
+    "date-picker-card": "/components/date-picker-card/date-picker-card",
+    "image-uploader": "/components/image-uploader/image-uploader"
   }
 }

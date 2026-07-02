@@ -44,6 +44,7 @@ exports.main = async (event, context) => {
       let formulaMilk = 0;
       let totalSleepMin = 0;
       let foodGrams = 0;
+      let foodMl = 0;
       let poopCount = 0;
 
       if (record) {
@@ -53,7 +54,9 @@ exports.main = async (event, context) => {
           else formulaMilk += m.amount || 0;
         });
         (record.foodRecords || []).forEach((f) => {
-          foodGrams += f.amount || 0;
+          const amount = f.amount || 0;
+          if (f.unit === 'ml') foodMl += amount;
+          else foodGrams += amount;
         });
         (record.sleepRecords || []).forEach((s) => {
           totalSleepMin += s.duration || calcSleepDuration(s.startTime, s.endTime);
@@ -61,7 +64,7 @@ exports.main = async (event, context) => {
         poopCount = (record.poopRecords || []).length;
       }
 
-      return { date, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount };
+      return { date, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, foodMl, poopCount };
     });
 
     return { success: true, stats };

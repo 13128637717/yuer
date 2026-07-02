@@ -2,3 +2,19 @@
 .milk-list {
   background: linear-gradient(180deg, #FFFFFF 0%, #FFF4F1 100%);
 }
+
+.recent-pref {
+  font-size: 24rpx;
+  color: var(--primary-dark);
+  text-align: center;
+  padding: 16rpx;
+  margin-bottom: 16rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.empty-img {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 16rpx;
+}

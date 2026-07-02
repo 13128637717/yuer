@@ -1,3 +1,28 @@
+.week-summary {
+  margin-bottom: 24rpx;
+  padding: 24rpx 28rpx;
+  font-size: 26rpx;
+  color: var(--text-primary);
+  line-height: 1.5;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFF0EA 100%);
+}
+
+.chart-skeleton {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.72);
+  z-index: 2;
+}
+
+.chart-card.is-loading .chart-container {
+  position: relative;
+}
+
 .tabs {
   margin-bottom: 24rpx;
 }
@@ -89,4 +114,12 @@ ec-canvas {
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.share-canvas {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 600px;
+  height: 800px;
 }

@@ -83,6 +83,7 @@ function aggregateRecord(record) {
   let formulaMilk = 0;
   let totalSleepMin = 0;
   let foodGrams = 0;
+  let foodMl = 0;
   let poopCount = 0;
 
   if (record) {
@@ -92,7 +93,9 @@ function aggregateRecord(record) {
       else formulaMilk += m.amount || 0;
     });
     (record.foodRecords || []).forEach((f) => {
-      foodGrams += f.amount || 0;
+      const amount = f.amount || 0;
+      if (f.unit === 'ml') foodMl += amount;
+      else foodGrams += amount;
     });
     (record.sleepRecords || []).forEach((s) => {
       totalSleepMin += s.duration || 0;
@@ -100,7 +103,7 @@ function aggregateRecord(record) {
     poopCount = (record.poopRecords || []).length;
   }
 
-  return { totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount };
+  return { totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, foodMl, poopCount };
 }
 
 function formatSleepText(totalSleepMin) {
@@ -112,14 +115,16 @@ function formatSleepText(totalSleepMin) {
   return `${sleepH} 小时 ${sleepM} 分钟`;
 }
 
-function buildReportContent({ yesterday, babyName, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, poopCount }) {
+function buildReportContent({
+  yesterday, babyName, totalMilk, breastMilk, formulaMilk, totalSleepMin, foodGrams, foodMl, poopCount
+}) {
   const header = [
     '🌱 **宝宝成长日报**',
     `> 📅 ${yesterday}　👶 ${babyName}`,
     ''
   ];
 
-  if (!totalMilk && !foodGrams && !totalSleepMin && !poopCount) {
+  if (!totalMilk && !foodGrams && !foodMl && !totalSleepMin && !poopCount) {
     return [
       ...header,
       '📝 昨日暂无喂养记录',
@@ -140,8 +145,11 @@ function buildReportContent({ yesterday, babyName, totalMilk, breastMilk, formul
     sections.push('🍼 奶量　暂无记录', '');
   }
 
-  if (foodGrams > 0) {
-    sections.push(`🥣 辅食　${foodGrams} g`, '');
+  if (foodGrams > 0 || foodMl > 0) {
+    const parts = [];
+    if (foodGrams > 0) parts.push(`${foodGrams} g`);
+    if (foodMl > 0) parts.push(`${foodMl} ml`);
+    sections.push(`🥣 辅食　${parts.join('、')}`, '');
   }
 
   if (poopCount > 0) {
@@ -203,8 +211,22 @@ exports.main = async (event, context) => {
   console.log(`[dailyNotify] 执行，北京时间 ${today} ${currentTime}，统计日期: ${yesterday}，force=${forceRun}`);
 
   try {
-    const settingsRes = await db.collection('settings').limit(100).get();
-    const settingsList = settingsRes.data.filter((setting) => {
+    const PAGE_SIZE = 100;
+    let allSettings = [];
+    let skip = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const settingsRes = await db.collection('settings').skip(skip).limit(PAGE_SIZE).get();
+      allSettings = allSettings.concat(settingsRes.data);
+      if (settingsRes.data.length < PAGE_SIZE) {
+        hasMore = false;
+      } else {
+        skip += PAGE_SIZE;
+      }
+    }
+
+    const settingsList = allSettings.filter((setting) => {
       if (!isNotifyEnabled(setting.notifyEnabled)) return false;
       if (!hasWebhook(setting.robotWebhook)) return false;
       if (targetFamilyId && setting.familyId !== targetFamilyId) return false;

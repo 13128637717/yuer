@@ -1,0 +1,9 @@
+<view class="date-picker card" hover-class="card-hover">
+  <picker mode="date" value="{{recordDate}}" end="{{limitFuture ? todayDate : ''}}" bindchange="onDateChange">
+    <view class="date-display">
+      <image class="date-icon" src="/images/icons/calendar.png" mode="aspectFit" />
+      <text class="date-value">{{recordDate}}</text>
+      <text class="date-arrow">▼</text>
+    </view>
+  </picker>
+</view>

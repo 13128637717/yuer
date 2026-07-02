@@ -1,6 +1,7 @@
 // 云函数：recordOperate - 统一处理记录的增删改查
 const {
-  cloud, db, getUser, resolveUserFamily, verifyFamilyMember, getOrCreateRecord, calcSleepDuration
+  cloud, db, getUser, resolveUserFamily, verifyFamilyMember, getOrCreateRecord, calcSleepDuration,
+  buildRecordMeta, stampRecords, hasRecordData
 } = require('./utils');
 
 exports.main = async (event, context) => {
@@ -33,6 +34,10 @@ exports.main = async (event, context) => {
         return await getTodaySummary(familyId, event.recordDate);
       case 'listRecords':
         return await listRecords(familyId, event, openid);
+      case 'listRecordsPage':
+        return await listRecordsPage(familyId, event, openid);
+      case 'getRecordDates':
+        return await getRecordDates(familyId, event, openid);
       case 'resolveFileUrls':
         return await resolveFileUrls(familyId, event, openid);
       default:
@@ -68,21 +73,28 @@ async function getRecord(familyId, recordDate, openid) {
   return { success: true, record };
 }
 
-/** 获取心得历史列表 */
+/** 获取心得历史列表（含仅图片无文字的记录） */
 async function getDiaryList(familyId, event) {
   const { startDate, endDate, limit = 30 } = event;
-  const query = { familyId, diary: db.command.neq('') };
+  const query = { familyId };
   if (startDate && endDate) {
     query.recordDate = db.command.gte(startDate).and(db.command.lte(endDate));
   }
 
+  const fetchLimit = Math.min(Math.max(limit * 3, limit), 100);
   const res = await db.collection('records')
     .where(query)
     .orderBy('recordDate', 'desc')
-    .limit(limit)
+    .limit(fetchLimit)
     .get();
 
-  return { success: true, list: res.data };
+  const list = res.data.filter((r) => {
+    const hasText = !!(r.diary && String(r.diary).trim());
+    const hasImages = (r.diaryImages || []).length > 0;
+    return hasText || hasImages;
+  }).slice(0, limit);
+
+  return { success: true, list };
 }
 
 /** 保存奶量记录 */
@@ -94,9 +106,8 @@ async function saveMilk(familyId, event, openid) {
   const record = await getOrCreateRecord(familyId, recordDate, openid);
   await db.collection('records').doc(record._id).update({
     data: {
-      milkRecords: milkRecords || [],
-      creatorOpenid: openid,
-      updateTime: db.serverDate()
+      milkRecords: stampRecords(milkRecords, openid, verify.family),
+      ...buildRecordMeta(openid, verify.family)
     }
   });
 
@@ -112,9 +123,8 @@ async function saveFood(familyId, event, openid) {
   const record = await getOrCreateRecord(familyId, recordDate, openid);
   await db.collection('records').doc(record._id).update({
     data: {
-      foodRecords: foodRecords || [],
-      creatorOpenid: openid,
-      updateTime: db.serverDate()
+      foodRecords: stampRecords(foodRecords, openid, verify.family),
+      ...buildRecordMeta(openid, verify.family)
     }
   });
 
@@ -136,9 +146,8 @@ async function saveSleep(familyId, event, openid) {
   const record = await getOrCreateRecord(familyId, recordDate, openid);
   await db.collection('records').doc(record._id).update({
     data: {
-      sleepRecords: processed,
-      creatorOpenid: openid,
-      updateTime: db.serverDate()
+      sleepRecords: stampRecords(processed, openid, verify.family),
+      ...buildRecordMeta(openid, verify.family)
     }
   });
 
@@ -153,8 +162,7 @@ async function saveDiary(familyId, event, openid) {
 
   const record = await getOrCreateRecord(familyId, recordDate, openid);
   const updateData = {
-    creatorOpenid: openid,
-    updateTime: db.serverDate()
+    ...buildRecordMeta(openid, verify.family)
   };
   if (diary !== undefined) updateData.diary = diary;
   if (diaryImages !== undefined) updateData.diaryImages = diaryImages;
@@ -173,9 +181,8 @@ async function savePoop(familyId, event, openid) {
   const record = await getOrCreateRecord(familyId, recordDate, openid);
   await db.collection('records').doc(record._id).update({
     data: {
-      poopRecords: poopRecords || [],
-      creatorOpenid: openid,
-      updateTime: db.serverDate()
+      poopRecords: stampRecords(poopRecords, openid, verify.family),
+      ...buildRecordMeta(openid, verify.family)
     }
   });
 
@@ -193,7 +200,10 @@ async function getTodaySummary(familyId, recordDate) {
   if (!record) {
     return {
       success: true,
-      summary: { totalMilk: 0, foodGrams: 0, totalSleepMin: 0, breastMilk: 0, formulaMilk: 0, poopCount: 0 }
+      summary: {
+        totalMilk: 0, foodGrams: 0, foodMl: 0, totalSleepMin: 0,
+        breastMilk: 0, formulaMilk: 0, poopCount: 0
+      }
     };
   }
 
@@ -206,10 +216,7 @@ async function getTodaySummary(familyId, recordDate) {
     else formulaMilk += m.amount || 0;
   });
 
-  let foodGrams = 0;
-  (record.foodRecords || []).forEach((f) => {
-    foodGrams += f.amount || 0;
-  });
+  const foodTotals = calcFoodTotals(record.foodRecords);
   let totalSleepMin = 0;
   (record.sleepRecords || []).forEach((s) => {
     totalSleepMin += s.duration || calcSleepDuration(s.startTime, s.endTime);
@@ -219,9 +226,28 @@ async function getTodaySummary(familyId, recordDate) {
 
   return {
     success: true,
-    summary: { totalMilk, foodGrams, totalSleepMin, breastMilk, formulaMilk, poopCount },
+    summary: {
+      totalMilk,
+      foodGrams: foodTotals.foodGrams,
+      foodMl: foodTotals.foodMl,
+      totalSleepMin,
+      breastMilk,
+      formulaMilk,
+      poopCount
+    },
     record
   };
+}
+
+function calcFoodTotals(foodRecords) {
+  let foodGrams = 0;
+  let foodMl = 0;
+  (foodRecords || []).forEach((f) => {
+    const amount = f.amount || 0;
+    if (f.unit === 'ml') foodMl += amount;
+    else foodGrams += amount;
+  });
+  return { foodGrams, foodMl };
 }
 
 /** 批量查询记录（支持日期范围或全部） */
@@ -269,6 +295,67 @@ async function listRecords(familyId, event, openid) {
   return { success: true, records: simplified };
 }
 
+/** 分页查询记录（用于大量导出） */
+async function listRecordsPage(familyId, event, openid) {
+  const { startDate, endDate, page = 0, pageSize = 100 } = event;
+  const verify = await verifyFamilyMember(openid, familyId);
+  if (!verify.valid) return { success: false, message: verify.message };
+
+  const query = { familyId };
+  if (startDate && endDate) {
+    query.recordDate = db.command.gte(startDate).and(db.command.lte(endDate));
+  }
+
+  const skip = Math.max(0, page) * pageSize;
+  const res = await db.collection('records')
+    .where(query)
+    .orderBy('recordDate', 'asc')
+    .skip(skip)
+    .limit(pageSize)
+    .get();
+
+  const simplified = res.data.map((r) => ({
+    recordDate: r.recordDate,
+    milkRecords: r.milkRecords || [],
+    foodRecords: r.foodRecords || [],
+    sleepRecords: r.sleepRecords || [],
+    poopRecords: r.poopRecords || [],
+    diary: r.diary || '',
+    diaryImages: r.diaryImages || []
+  }));
+
+  return {
+    success: true,
+    records: simplified,
+    page,
+    hasMore: res.data.length === pageSize
+  };
+}
+
+/** 获取有记录的日期列表（用于日历打点） */
+async function getRecordDates(familyId, event, openid) {
+  const { startDate, endDate, limit = 60 } = event;
+  const verify = await verifyFamilyMember(openid, familyId);
+  if (!verify.valid) return { success: false, message: verify.message };
+
+  const query = { familyId };
+  if (startDate && endDate) {
+    query.recordDate = db.command.gte(startDate).and(db.command.lte(endDate));
+  }
+
+  const res = await db.collection('records')
+    .where(query)
+    .orderBy('recordDate', 'desc')
+    .limit(Math.min(limit, 100))
+    .get();
+
+  const dates = res.data
+    .filter(hasRecordData)
+    .map((r) => r.recordDate);
+
+  return { success: true, dates };
+}
+
 /** 从 fileID 提取云存储路径 */
 function extractCloudPath(fileID) {
   const match = String(fileID).match(/^cloud:\/\/[^/]+\/(.+)$/);
@@ -277,7 +364,9 @@ function extractCloudPath(fileID) {
 
 /** 校验文件路径是否属于当前家庭 */
 function isFamilyStoragePath(cloudPath, familyId) {
-  return cloudPath.startsWith(`diary/${familyId}/`) || cloudPath.startsWith(`poop/${familyId}/`);
+  return cloudPath.startsWith(`diary/${familyId}/`)
+    || cloudPath.startsWith(`poop/${familyId}/`)
+    || cloudPath.startsWith(`avatar/${familyId}/`);
 }
 
 /** 云函数管理员权限换取临时链接，绕过客户端存储读权限限制 */

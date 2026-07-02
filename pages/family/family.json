@@ -4,6 +4,7 @@
   "enableShareAppMessage": true,
   "enableShareTimeline": true,
   "usingComponents": {
-    "time-picker": "/components/time-picker/time-picker"
+    "time-picker": "/components/time-picker/time-picker",
+    "image-uploader": "/components/image-uploader/image-uploader"
   }
 }

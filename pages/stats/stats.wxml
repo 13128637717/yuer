@@ -1,45 +1,49 @@
 <view class="container">
   <view wx:if="{{!hasFamily}}" class="empty-state card fade-up">
-    <text class="empty-icon">📊</text>
+    <image class="empty-img" src="/images/illustrations/empty-stats.png" mode="aspectFit" />
     <text class="empty-title">还没有家庭数据</text>
     <text class="empty-desc">创建或加入家庭后，就能看到宝宝成长趋势啦</text>
   </view>
 
   <block wx:else>
-    <!-- 时间段切换 -->
+    <view wx:if="{{weekSummary}}" class="week-summary card fade-up">{{weekSummary}}</view>
+
     <view class="tabs card pill-tabs">
       <view class="tab-item pill-tab {{days === 7 ? 'active' : ''}}" data-days="7" hover-class="pressable-hover" bindtap="switchDays">最近7天</view>
       <view class="tab-item pill-tab {{days === 30 ? 'active' : ''}}" data-days="30" hover-class="pressable-hover" bindtap="switchDays">最近30天</view>
     </view>
 
-    <!-- 奶量趋势图 -->
-    <view class="chart-card card milk-chart fade-up" hover-class="card-hover">
-      <view class="chart-title">🍼 奶量趋势 (ml)</view>
+    <view class="chart-card card milk-chart fade-up {{loading ? 'is-loading' : ''}}" hover-class="card-hover">
+      <view class="chart-title">🍼 奶量趋势 (母乳/配方奶/总量)</view>
       <view class="chart-container">
+        <view wx:if="{{loading}}" class="chart-skeleton">加载中...</view>
         <ec-canvas id="milkChart" canvas-id="milkChart" ec="{{ecMilk}}"></ec-canvas>
       </view>
     </view>
 
     <!-- 辅食趋势图 -->
-    <view class="chart-card card food-chart fade-up" hover-class="card-hover">
-      <view class="chart-title">🥣 辅食趋势 (g)</view>
+    <view class="chart-card card food-chart fade-up {{loading ? 'is-loading' : ''}}" hover-class="card-hover">
+      <view class="chart-title">🥣 辅食趋势 (g / ml)</view>
       <view class="chart-container">
+        <view wx:if="{{loading}}" class="chart-skeleton">加载中...</view>
         <ec-canvas id="foodChart" canvas-id="foodChart" ec="{{ecFood}}"></ec-canvas>
       </view>
     </view>
 
     <!-- 睡眠趋势图 -->
-    <view class="chart-card card sleep-chart fade-up" hover-class="card-hover">
+    <view class="chart-card card sleep-chart fade-up {{loading ? 'is-loading' : ''}}" hover-class="card-hover">
       <view class="chart-title">😴 睡眠趋势 (小时)</view>
       <view class="chart-container">
+        <view wx:if="{{loading}}" class="chart-skeleton">加载中...</view>
         <ec-canvas id="sleepChart" canvas-id="sleepChart" ec="{{ecSleep}}"></ec-canvas>
       </view>
     </view>
 
     <!-- 拉粑粑次数趋势图 -->
-    <view class="chart-card card poop-chart fade-up" hover-class="card-hover">
+    <view class="chart-card card poop-chart fade-up {{loading ? 'is-loading' : ''}}" hover-class="card-hover">
       <view class="chart-title">💩 拉粑粑次数</view>
       <view class="chart-container">
+        <view wx:if="{{loading}}" class="chart-skeleton">加载中...</view>
         <ec-canvas id="poopChart" canvas-id="poopChart" ec="{{ecPoop}}"></ec-canvas>
       </view>
     </view>
@@ -48,7 +52,8 @@
 
     <!-- 导出记录 -->
     <view class="export-section card fade-up">
-      <button wx:if="{{!showExport}}" class="btn-primary" hover-class="button-hover" bindtap="openExport">导出记录</button>
+      <button class="btn-secondary share-card-btn" hover-class="button-hover" bindtap="shareDailyCard" disabled="{{shareLoading}}">{{shareLoading ? '生成中...' : '生成今日分享图'}}</button>
+      <button wx:if="{{!showExport}}" class="btn-primary btn-stack-gap" hover-class="button-hover" bindtap="openExport">导出记录</button>
       <block wx:if="{{showExport}}">
         <view class="section-title">📤 导出记录</view>
         <view class="export-tabs pill-tabs">
@@ -57,10 +62,12 @@
           <view class="export-tab pill-tab {{exportRange === 'all' ? 'active' : ''}}" data-range="all" hover-class="pressable-hover" bindtap="switchExportRange">全部记录</view>
         </view>
         <scroll-view class="export-text-wrap" scroll-y="{{true}}">
-          <view class="export-text" user-select>{{exportLoading ? '加载中...' : exportText}}</view>
+          <view class="export-text" user-select>{{exportLoading ? (exportProgress || '加载中...') : exportText}}</view>
         </scroll-view>
-        <button class="btn-primary" style="margin-top:24rpx" hover-class="button-hover" bindtap="copyExportText" disabled="{{exportLoading || !exportText}}">复制到剪贴板</button>
+        <button class="btn-primary btn-stack-gap" hover-class="button-hover" bindtap="copyExportText" disabled="{{exportLoading || !exportText}}">复制到剪贴板</button>
       </block>
     </view>
   </block>
+
+  <canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>
 </view>

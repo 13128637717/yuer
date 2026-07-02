@@ -1,5 +1,6 @@
-const { callFunction, getFamilyContext, applyFamilyContext, syncFamilyContext } = require('../../utils/cloud');
+const { callFunction, uploadImage, resolveCloudFileUrls, getFamilyContext, applyFamilyContext, syncFamilyContext } = require('../../utils/cloud');
 const { isValidNickName, getCachedProfile, syncProfileToServer } = require('../../utils/user');
+const { milkReminderTmplId, sleepReminderTmplId } = require('../../config/subscribe');
 
 function normalizeSettings(settings) {
   if (!settings) {
@@ -33,11 +34,18 @@ Page({
     showBabyEditForm: false,
     editBabyName: '',
     editBabyBirth: '',
+    babyAvatarUrl: '/images/illustrations/baby-avatar.png',
+    editBabyAvatar: '',
+    editBabyAvatarUrl: '',
+    createBabyAvatarTemp: '',
+    createBabyAvatarUrl: '',
+    avatarUploading: false,
     switchingFamily: false,
     nickName: '',
     hasValidNick: false,
     pendingAction: '',
-    fromInvite: false
+    fromInvite: false,
+    invitePreview: null
   },
 
   _loadRequestId: 0,
@@ -139,6 +147,7 @@ Page({
               inviteCode: code,
               fromInvite: true
             });
+            this.loadInvitePreview(code);
           }
         }
       });
@@ -151,6 +160,21 @@ Page({
       inviteCode: code,
       fromInvite: true
     });
+    this.loadInvitePreview(code);
+  },
+
+  async loadInvitePreview(inviteCode) {
+    try {
+      const res = await callFunction('familyOperate', {
+        action: 'preview',
+        inviteCode
+      });
+      if (res.preview) {
+        this.setData({ invitePreview: res.preview });
+      }
+    } catch (err) {
+      console.warn('加载邀请预览失败', err);
+    }
   },
 
   onPullDownRefresh() {
@@ -175,6 +199,11 @@ Page({
       notifyEnabled: normalized.notifyEnabled,
       notifyTime: normalized.notifyTime
     });
+    if (hasFamily && family) {
+      this.resolveBabyAvatarUrl(family).then((babyAvatarUrl) => {
+        this.setData({ babyAvatarUrl });
+      });
+    }
     this.initNickNameFromCache();
   },
 
@@ -195,6 +224,14 @@ Page({
     this.initNickNameFromCache();
   },
 
+  async resolveBabyAvatarUrl(family) {
+    if (!family || !family.babyAvatar) {
+      return '/images/illustrations/baby-avatar.png';
+    }
+    const [url] = await resolveCloudFileUrls([family.babyAvatar]);
+    return url || '/images/illustrations/baby-avatar.png';
+  },
+
   async loadFamilyInfo(force = false) {
     const requestId = ++this._loadRequestId;
     try {
@@ -203,11 +240,13 @@ Page({
 
       const { hasFamily, family, settings, userInfo } = getFamilyContext();
       const normalized = normalizeSettings(settings);
+      const babyAvatarUrl = hasFamily ? await this.resolveBabyAvatarUrl(family) : '/images/illustrations/baby-avatar.png';
       this.setData({
         hasFamily,
         family,
         settings,
         userInfo,
+        babyAvatarUrl,
         isCreator: !!(userInfo && userInfo.role === 'creator'),
         robotWebhook: normalized.robotWebhook,
         notifyEnabled: normalized.notifyEnabled,
@@ -367,7 +406,9 @@ Page({
     this.setData({
       showBabyEditForm: true,
       editBabyName: family ? family.babyName : '',
-      editBabyBirth: family ? (family.babyBirth || '') : ''
+      editBabyBirth: family ? (family.babyBirth || '') : '',
+      editBabyAvatar: family ? (family.babyAvatar || '') : '',
+      editBabyAvatarUrl: this.data.babyAvatarUrl
     });
   },
 
@@ -377,6 +418,48 @@ Page({
 
   onEditBabyNameInput(e) { this.setData({ editBabyName: e.detail.value }); },
   onEditBabyBirthChange(e) { this.setData({ editBabyBirth: e.detail.value }); },
+
+  onCreateAvatarChange(e) {
+    const { fileIds, imageUrls } = e.detail;
+    this.setData({
+      createBabyAvatarTemp: (fileIds && fileIds[0]) || '',
+      createBabyAvatarUrl: (imageUrls && imageUrls[0]) || ''
+    });
+  },
+
+  chooseCreateAvatar() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const file = res.tempFiles[0];
+        if (!file) return;
+        this.setData({
+          createBabyAvatarTemp: file.tempFilePath,
+          createBabyAvatarUrl: file.tempFilePath
+        });
+      }
+    });
+  },
+
+  removeCreateAvatar() {
+    this.setData({ createBabyAvatarTemp: '', createBabyAvatarUrl: '' });
+  },
+
+  onEditAvatarChange(e) {
+    const { fileIds, imageUrls } = e.detail;
+    this.setData({
+      editBabyAvatar: (fileIds && fileIds[0]) || '',
+      editBabyAvatarUrl: (imageUrls && imageUrls[0]) || ''
+    });
+  },
+
+  async uploadBabyAvatar(filePath, familyId) {
+    const ext = filePath.split('.').pop() || 'jpg';
+    const cloudPath = `avatar/${familyId}/baby.${ext}`;
+    return uploadImage(filePath, cloudPath);
+  },
 
   onBabyNameInput(e) { this.setData({ babyName: e.detail.value }); },
   onBabyBirthChange(e) { this.setData({ babyBirth: e.detail.value }); },
@@ -399,6 +482,33 @@ Page({
   onSaveSettingsTap() {
     this.saveSettings();
   },
+
+  requestSubscribeReminders() {
+    const tmplIds = [milkReminderTmplId, sleepReminderTmplId].filter(Boolean);
+    if (!tmplIds.length) {
+      wx.showModal({
+        title: '模板未配置',
+        content: '请在 config/subscribe.js 中填入微信公众平台申请的订阅消息模板 ID 后重试。',
+        showCancel: false
+      });
+      return;
+    }
+    wx.requestSubscribeMessage({
+      tmplIds,
+      success: (res) => {
+        const accepted = tmplIds.filter((id) => res[id] === 'accept');
+        if (accepted.length) {
+          wx.showToast({ title: `已订阅 ${accepted.length} 项提醒`, icon: 'success' });
+        } else {
+          wx.showToast({ title: '未开启订阅', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '订阅请求失败', icon: 'none' });
+      }
+    });
+  },
+
   async onTestNotifyTap() {
     const { familyId } = getFamilyContext();
     if (!this.data.notifyEnabled) {
@@ -469,7 +579,7 @@ Page({
 
   // 保存宝宝信息
   async saveBabyInfo() {
-    const { editBabyName, editBabyBirth } = this.data;
+    const { editBabyName, editBabyBirth, editBabyAvatar } = this.data;
     if (!editBabyName.trim()) {
       wx.showToast({ title: '请输入宝宝姓名', icon: 'none' });
       return;
@@ -482,17 +592,23 @@ Page({
         action: 'updateBaby',
         familyId,
         babyName: editBabyName.trim(),
-        babyBirth: editBabyBirth
+        babyBirth: editBabyBirth,
+        babyAvatar: editBabyAvatar
       });
       wx.hideLoading();
       if (res.family) {
+        const babyAvatarUrl = await this.resolveBabyAvatarUrl(res.family);
         applyFamilyContext({
           hasFamily: true,
           family: res.family,
           settings: this.data.settings,
           user: this.data.userInfo
         });
-        this.setData({ family: res.family, showBabyEditForm: false });
+        this.setData({
+          family: res.family,
+          babyAvatarUrl,
+          showBabyEditForm: false
+        });
       }
       wx.showToast({ title: '保存成功', icon: 'success' });
     } catch (err) {
@@ -502,7 +618,7 @@ Page({
 
   // 创建家庭
   async createFamily() {
-    const { babyName, babyBirth, switchingFamily, nickName } = this.data;
+    const { babyName, babyBirth, switchingFamily, nickName, createBabyAvatarTemp } = this.data;
     if (!babyName.trim()) {
       wx.showToast({ title: '请输入宝宝姓名', icon: 'none' });
       return;
@@ -519,7 +635,18 @@ Page({
         nickName,
         switchFamily: switchingFamily
       });
+      if (res.family && createBabyAvatarTemp) {
+        const familyId = res.family.familyId;
+        const babyAvatar = await this.uploadBabyAvatar(createBabyAvatarTemp, familyId);
+        const updateRes = await callFunction('familyOperate', {
+          action: 'updateBaby',
+          familyId,
+          babyAvatar
+        });
+        if (updateRes.family) res.family = updateRes.family;
+      }
       wx.hideLoading();
+      this.setData({ createBabyAvatarTemp: '', createBabyAvatarUrl: '' });
       this.applyFamilyInfo(res);
       wx.showToast({ title: '创建成功', icon: 'success' });
     } catch (err) {

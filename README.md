@@ -1,13 +1,15 @@
 # 宝宝成长助手
 
-基于微信小程序原生框架 + 微信云开发的宝宝成长记录应用。支持奶量、辅食、睡眠、心得记录，家人协作共享，统计图表，以及每日企业微信群日报推送。
+基于微信小程序原生框架 + 微信云开发的宝宝成长记录应用。支持奶量、辅食、睡眠、心得、拉粑粑记录，家人协作共享，统计图表，宝宝头像，以及可配置时间的企业微信群日报推送。
 
 ## 功能概览
 
-- **每日记录**：奶量（母乳/配方奶）、辅食、睡眠、带娃心得（支持图片）
+- **每日记录**：奶量（母乳/配方奶）、辅食（g/ml 分计）、睡眠（含计时器）、带娃心得（支持图片）、拉粑粑（含状态图）
+- **宝宝头像**：家庭页上传，首页与家庭页展示
 - **家人协作**：创建家庭 / 邀请码加入，多人共同查看编辑
-- **数据统计**：最近 7 天 / 30 天奶量与睡眠趋势折线图（echarts）
-- **定时推送**：每天 00:00 自动推送前一天成长日报到企业微信群
+- **数据统计**：最近 7 天 / 30 天奶量、辅食、睡眠、拉粑粑趋势图（echarts）
+- **今日时间线**：首页与记录中心按时间汇总当日记录
+- **定时推送**：按家庭配置的 `notifyTime` 推送前一天成长日报（触发器每小时整点检查）
 
 ## 技术栈
 
@@ -28,107 +30,66 @@
 
 1. 开发者工具 → 云开发 → 开通
 2. 创建云环境，复制 **环境 ID**
-3. 修改 [`app.js`](app.js) 中的环境 ID：
-
-```javascript
-wx.cloud.init({
-  env: '你的云环境ID',  // 替换 YOUR_CLOUD_ENV
-  traceUser: true
-});
-```
+3. 修改 [`app.js`](app.js) 引用的 [`config/env.js`](config/env.js) 中的 `cloudEnvId`
 
 ### 3. 创建数据库集合
 
-在云开发控制台 → 数据库，创建以下集合并设置权限为 **「仅管理端可读写」**（所有用户不可读写，仅云函数操作）：
+在云开发控制台 → 数据库，创建以下集合并设置权限为 **「仅管理端可读写」**：
 
 | 集合名 | 说明 | 建议索引 |
 |--------|------|----------|
 | `users` | 用户信息 | `_openid`（默认）、`familyId` |
-| `families` | 家庭组 | `familyId`（唯一） |
+| `families` | 家庭组（含 `babyAvatar`） | `familyId`（唯一） |
 | `records` | 每日记录 | `familyId` + `recordDate`（复合） |
 | `settings` | 家庭配置 | `familyId` |
 
 ### 4. 部署云函数
 
-在微信开发者工具中，右键 `cloudfunctions` 下每个云函数文件夹 → **上传并部署：云端安装依赖**：
+右键 `cloudfunctions` 下每个云函数 → **上传并部署：云端安装依赖**：
 
-- `login`
-- `familyOperate`
-- `recordOperate`
-- `getStats`
-- `dailyNotify`（含定时触发器，每天 00:00 执行）
+- `login`、`familyOperate`、`recordOperate`、`getStats`、`dailyNotify`
 
-> `dailyNotify` 依赖 `got` 包，务必选择「云端安装依赖」。
+> `dailyNotify` 依赖 `got` 包；部署后需上传 `config.json` 触发器。
 
-### 5. TabBar 图标（可选）
+### 5. ECharts 依赖
 
-项目已包含占位图标（`images/tab/`）。如需替换：
-
-- 尺寸：81×81 px，PNG 格式
-- 文件：`home.png`、`home-active.png`、`records.png`、`records-active.png`、`stats.png`、`stats-active.png`、`family.png`、`family-active.png`
-- 或运行 `node scripts/gen-icons.js` 重新生成占位图
+统计页依赖 [`components/ec-canvas/echarts.js`](components/ec-canvas/echarts.js)（来自 [echarts-for-weixin](https://github.com/ecomfe/echarts-for-weixin)）。若缺失，请从该仓库复制 `ec-canvas/echarts.js` 到本项目对应目录。
 
 ### 6. 配置企业微信推送
 
 1. 在企业微信群中添加群机器人，获取 Webhook 地址
-2. 小程序 → 我的 → 通知设置 → 填入 Webhook 并开启推送
-3. 每天 00:00 自动推送前一天日报（`notifyTime` 字段预留，当前固定 00:00）
+2. 小程序 → 我的 → 通知设置 → 填入 Webhook、开启推送并设置推送时间
 
 ## 项目结构
 
 ```
 wx-yuer/
-├── app.js / app.json / app.wxss     # 小程序入口
-├── pages/
-│   ├── index/                       # 首页仪表盘
-│   ├── records/                     # 记录中心（Tab）
-│   ├── stats/                       # 统计图表（Tab）
-│   ├── family/                      # 家庭管理（Tab）
-│   ├── milk/ food/ sleep/ diary/    # 记录子页面
-├── components/ec-canvas/            # echarts 图表组件
-├── cloudfunctions/                  # 云函数
-│   ├── login/                       # 用户登录
-│   ├── familyOperate/               # 家庭操作
-│   ├── recordOperate/               # 记录 CRUD
-│   ├── getStats/                    # 统计数据
-│   └── dailyNotify/                 # 定时推送（00:00）
-├── utils/                           # 工具函数
-└── images/tab/                      # TabBar 图标
+├── pages/index|records|stats|family/   # Tab 页面
+├── pages/milk|food|sleep|diary|poop/   # 记录子页面
+├── components/
+│   ├── ec-canvas/          # echarts 图表
+│   ├── time-picker/        # 时间选择器
+│   ├── date-picker-card/   # 日期选择卡片
+│   ├── image-uploader/     # 图片上传
+│   └── card-header/        # 区块标题
+├── cloudfunctions/         # 云函数
+├── utils/                  # cloud.js、date.js、record.js、user.js
+└── images/                 # tab 图标、功能图标、插图
 ```
 
-## 云函数说明
+## 云存储路径
 
-| 云函数 | 功能 |
-|--------|------|
-| `login` | 获取 openid，返回用户与家庭信息 |
-| `familyOperate` | 创建/加入/退出家庭，成员管理，设置 |
-| `recordOperate` | 记录增删改查，今日汇总 |
-| `getStats` | 按日期范围聚合奶量与睡眠数据 |
-| `dailyNotify` | 定时触发，推送企业微信群 Markdown 消息 |
-
-### 定时触发器
-
-`dailyNotify/config.json` 配置为每天 00:00 执行（`0 0 0 * * * *`），统计前一天数据。通过 `settings.lastNotifyDate` 防止重复推送。
+| 类型 | 路径 |
+|------|------|
+| 心得图片 | `diary/{familyId}/{recordDate}/` |
+| 拉粑粑图片 | `poop/{familyId}/{recordDate}/` |
+| 宝宝头像 | `avatar/{familyId}/` |
 
 ## 数据安全
 
 - 所有数据库操作通过云函数进行，客户端不直连数据库
 - 云函数内校验调用者 openid 是否为家庭成员
-- 集合权限设为仅云函数（管理端）可读写
-
-## 使用流程
-
-1. 首次打开 → 创建家庭或输入邀请码加入
-2. 首页查看今日概况，快捷记录奶量/辅食/睡眠/心得
-3. 记录 Tab 查看当天全部记录
-4. 统计 Tab 查看趋势图
-5. 我的 Tab 管理家庭成员与推送设置
-
-## 注意事项
-
-- 云存储用于心得图片，路径：`diary/{familyId}/{recordDate}/`
-- 睡眠跨天记录自动处理（结束时间小于开始时间则 +24 小时）
-- 真机预览需使用已配置云开发的小程序 AppID
+- 云图片通过 `recordOperate.resolveFileUrls` 换取临时链接
 
 ## License
 

@@ -1,0 +1,31 @@
+<view class="uploader {{circular ? 'is-circular' : ''}}">
+  <view
+    wx:for="{{imageUrls}}"
+    wx:key="index"
+    class="uploader-item {{circular ? 'is-circle' : ''}}"
+    data-index="{{index}}"
+    bindtap="previewImage"
+  >
+    <view class="uploader-img-wrap {{circular ? 'is-circle' : ''}}">
+      <image class="uploader-img" src="{{item}}" mode="aspectFill" />
+    </view>
+    <view
+      wx:if="{{!disabled}}"
+      class="uploader-remove {{circular ? 'is-circle' : ''}}"
+      data-index="{{index}}"
+      catchtap="removeImage"
+    >×</view>
+  </view>
+  <view
+    wx:if="{{fileIds.length < maxCount && !disabled}}"
+    class="uploader-add {{circular ? 'is-circle' : ''}}"
+    hover-class="pressable-hover"
+    bindtap="chooseImage"
+  >
+    <image wx:if="{{circular}}" class="add-icon" src="/images/icons/camera-add.png" mode="aspectFit" />
+    <block wx:else>
+      <image class="add-icon" src="/images/icons/camera-add.png" mode="aspectFit" />
+      <text class="add-text">{{uploading ? '上传中' : '添加图片'}}</text>
+    </block>
+  </view>
+</view>

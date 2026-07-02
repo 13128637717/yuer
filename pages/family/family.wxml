@@ -34,6 +34,14 @@
     <view wx:if="{{showCreateForm}}" class="form-card card fade-up">
       <view class="section-title">创建家庭</view>
       <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group avatar-group">
+        <text class="form-label">宝宝头像（选填）</text>
+        <view class="avatar-picker" bindtap="chooseCreateAvatar">
+          <image class="avatar-preview" src="{{createBabyAvatarUrl || '/images/illustrations/baby-avatar.png'}}" mode="aspectFill" />
+          <text class="avatar-hint">点击更换</text>
+        </view>
+        <view wx:if="{{createBabyAvatarUrl}}" class="avatar-remove" bindtap="removeCreateAvatar">移除头像</view>
+      </view>
       <view class="form-group">
         <text class="form-label">宝宝姓名</text>
         <view class="form-input-wrap">
@@ -52,7 +60,14 @@
     <!-- 加入表单 -->
     <view wx:if="{{showJoinForm}}" class="form-card card fade-up">
       <view class="section-title">加入家庭</view>
-      <view wx:if="{{fromInvite}}" class="invite-banner">
+      <view wx:if="{{invitePreview}}" class="invite-preview card">
+        <image class="invite-preview-avatar" src="{{invitePreview.babyAvatarUrl || '/images/illustrations/baby-avatar.png'}}" mode="aspectFill" />
+        <view class="invite-preview-info">
+          <view class="invite-preview-name">加入「{{invitePreview.babyName}}」的成长记录</view>
+          <view class="invite-preview-meta">{{invitePreview.memberCount}} 位家人已在记录 · 邀请码 {{invitePreview.familyId}}</view>
+        </view>
+      </view>
+      <view wx:elif="{{fromInvite}}" class="invite-banner">
         <text class="invite-banner-icon">💌</text>
         <text class="invite-banner-text">您收到了家庭邀请，确认昵称后即可加入</text>
       </view>
@@ -73,7 +88,7 @@
     <view class="family-info card fade-up" hover-class="card-hover">
       <block wx:if="{{!showBabyEditForm}}">
         <view class="baby-row">
-          <text class="baby-emoji bubble-icon">👶</text>
+          <image class="baby-avatar-img" src="{{babyAvatarUrl}}" mode="aspectFill" />
           <view class="baby-info-main">
             <view class="info-name">{{family.babyName}}</view>
             <view class="info-birth">生日：{{family.babyBirth || '未设置'}}</view>
@@ -83,6 +98,18 @@
       </block>
       <block wx:else>
         <view class="section-title">编辑宝宝信息</view>
+        <view class="form-group avatar-group">
+          <text class="form-label">宝宝头像</text>
+          <image-uploader
+            maxCount="{{1}}"
+            circular="{{true}}"
+            fileIds="{{editBabyAvatar ? [editBabyAvatar] : []}}"
+            imageUrls="{{editBabyAvatarUrl ? [editBabyAvatarUrl] : []}}"
+            cloudPathPrefix="avatar/{{family.familyId}}"
+            singleFileName="baby"
+            bindchange="onEditAvatarChange"
+          />
+        </view>
         <view class="form-group">
           <text class="form-label">宝宝姓名</text>
           <view class="form-input-wrap">
@@ -112,7 +139,7 @@
       </view>
       <view class="invite-actions">
         <button class="btn-primary invite-share-btn" hover-class="button-hover" open-type="share">微信邀请</button>
-        <button class="btn-secondary invite-copy-btn btn-stack-gap" hover-class="button-hover" bindtap="copyInviteCode">复制邀请信息</button>
+        <button class="btn-secondary invite-copy-btn" hover-class="button-hover" bindtap="copyInviteCode">复制邀请信息</button>
       </view>
     </view>
 
@@ -151,6 +178,13 @@
       <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="onTestNotifyTap">立即测试推送</button>
     </view>
 
+    <!-- 订阅消息提醒 -->
+    <view class="card settings-card fade-up">
+      <view class="section-title">小程序提醒</view>
+      <view class="setting-hint">开启微信订阅消息后，可在设定时间收到记奶、记睡眠等提醒（需先在公众平台配置模板 ID）</view>
+      <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="requestSubscribeReminders">开启订阅提醒</button>
+    </view>
+
     <!-- 切换家庭 -->
     <view wx:if="{{!showCreateForm && !showJoinForm}}" class="card fade-up">
       <view class="section-title">切换家庭</view>
@@ -163,6 +197,13 @@
     <view wx:if="{{showCreateForm && switchingFamily}}" class="form-card card fade-up">
       <view class="section-title">创建新家庭</view>
       <template is="nickNameRow" data="{{nickName: nickName, hasValidNick: hasValidNick}}" />
+      <view class="form-group avatar-group">
+        <text class="form-label">宝宝头像（选填）</text>
+        <view class="avatar-picker" bindtap="chooseCreateAvatar">
+          <image class="avatar-preview" src="{{createBabyAvatarUrl || '/images/illustrations/baby-avatar.png'}}" mode="aspectFill" />
+          <text class="avatar-hint">点击更换</text>
+        </view>
+      </view>
       <view class="form-group">
         <text class="form-label">宝宝姓名</text>
         <view class="form-input-wrap">
@@ -181,7 +222,14 @@
     <!-- 切换：加入表单 -->
     <view wx:if="{{showJoinForm && switchingFamily}}" class="form-card card fade-up">
       <view class="section-title">加入其他家庭</view>
-      <view wx:if="{{fromInvite}}" class="invite-banner">
+      <view wx:if="{{invitePreview}}" class="invite-preview card">
+        <image class="invite-preview-avatar" src="{{invitePreview.babyAvatarUrl || '/images/illustrations/baby-avatar.png'}}" mode="aspectFill" />
+        <view class="invite-preview-info">
+          <view class="invite-preview-name">加入「{{invitePreview.babyName}}」的成长记录</view>
+          <view class="invite-preview-meta">{{invitePreview.memberCount}} 位家人已在记录</view>
+        </view>
+      </view>
+      <view wx:elif="{{fromInvite}}" class="invite-banner">
         <text class="invite-banner-icon">💌</text>
         <text class="invite-banner-text">您收到了家庭邀请，确认昵称后即可加入</text>
       </view>

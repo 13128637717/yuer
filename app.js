@@ -1,6 +1,7 @@
 // 宝宝成长助手 - 小程序入口
 const { syncFamilyContext } = require('./utils/cloud');
 const { isValidNickName, saveCachedProfile } = require('./utils/user');
+const { cloudEnvId } = require('./config/env');
 
 App({
   onLaunch(options) {
@@ -9,7 +10,7 @@ App({
       return;
     }
     wx.cloud.init({
-      env: 'cloudbase-d4gnb2ja865b51da6',
+      env: cloudEnvId,
       traceUser: true
     });
 

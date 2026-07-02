@@ -51,6 +51,8 @@ exports.main = async (event, context) => {
         return await updateBaby(openid, event);
       case 'syncNickName':
         return await syncNickName(openid, event);
+      case 'preview':
+        return await previewFamily(event);
       default:
         return { success: false, message: '未知操作' };
     }
@@ -101,7 +103,7 @@ async function detachFromFamily(openid, user) {
 
 /** 创建家庭 */
 async function createFamily(openid, event) {
-  const { babyName, babyBirth, nickName, avatarUrl, switchFamily } = event;
+  const { babyName, babyBirth, babyAvatar, nickName, avatarUrl, switchFamily } = event;
   if (!babyName) return { success: false, message: '请输入宝宝姓名' };
 
   let user = await getUser(openid);
@@ -119,6 +121,7 @@ async function createFamily(openid, event) {
     familyId,
     babyName,
     babyBirth: babyBirth || '',
+    babyAvatar: babyAvatar || '',
     creatorOpenid: openid,
     members: [{ openid, nickName: displayName, role: 'creator' }],
     createTime: db.serverDate()
@@ -442,7 +445,7 @@ async function updateBaby(openid, event) {
   const verify = await verifyFamilyMember(openid, familyId);
   if (!verify.valid) return { success: false, message: verify.message };
 
-  const { babyName, babyBirth } = event;
+  const { babyName, babyBirth, babyAvatar } = event;
   if (babyName !== undefined && !String(babyName).trim()) {
     return { success: false, message: '请输入宝宝姓名' };
   }
@@ -450,9 +453,19 @@ async function updateBaby(openid, event) {
   const updateData = {};
   if (babyName !== undefined) updateData.babyName = String(babyName).trim();
   if (babyBirth !== undefined) updateData.babyBirth = babyBirth || '';
+  if (babyAvatar !== undefined) updateData.babyAvatar = babyAvatar || '';
 
   if (!Object.keys(updateData).length) {
     return { success: false, message: '没有可更新的内容' };
+  }
+
+  const oldAvatar = verify.family.babyAvatar;
+  if (babyAvatar !== undefined && oldAvatar && oldAvatar !== babyAvatar) {
+    try {
+      await cloud.deleteFile({ fileList: [oldAvatar] });
+    } catch (err) {
+      console.warn('删除旧宝宝头像失败:', err);
+    }
   }
 
   await db.collection('families').doc(verify.family._id).update({ data: updateData });
@@ -462,5 +475,43 @@ async function updateBaby(openid, event) {
     success: true,
     family: updatedRes.data,
     message: '宝宝信息已更新'
+  };
+}
+
+/** 邀请码预览家庭信息（无需已是成员） */
+async function previewFamily(event) {
+  const code = String(event.inviteCode || '').toUpperCase().trim();
+  if (!/^[A-Z0-9]{6}$/.test(code)) {
+    return { success: false, message: '邀请码格式无效' };
+  }
+
+  const familyRes = await db.collection('families').where({ familyId: code }).limit(1).get();
+  const family = familyRes.data[0];
+  if (!family) {
+    return { success: false, message: '邀请码无效或家庭不存在' };
+  }
+
+  let babyAvatarUrl = '';
+  if (family.babyAvatar) {
+    try {
+      const urlRes = await cloud.getTempFileURL({
+        fileList: [{ fileID: family.babyAvatar, maxAge: 3600 }]
+      });
+      const item = (urlRes.fileList || [])[0];
+      if (item && item.status === 0) babyAvatarUrl = item.tempFileURL;
+    } catch (err) {
+      console.warn('预览头像解析失败:', err);
+    }
+  }
+
+  return {
+    success: true,
+    preview: {
+      familyId: family.familyId,
+      babyName: family.babyName || '宝宝',
+      babyBirth: family.babyBirth || '',
+      memberCount: (family.members || []).length,
+      babyAvatarUrl
+    }
   };
 }

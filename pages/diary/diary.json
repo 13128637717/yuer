@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "带娃心得"
+  "navigationBarTitleText": "带娃心得",
+  "usingComponents": {
+    "date-picker-card": "/components/date-picker-card/date-picker-card",
+    "image-uploader": "/components/image-uploader/image-uploader"
+  }
 }

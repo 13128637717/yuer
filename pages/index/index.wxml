@@ -1,77 +1,234 @@
 <view class="container">
-  <!-- 无家庭引导 -->
+
   <view wx:if="{{!hasFamily}}" class="no-family card fade-up">
-    <view class="no-family-icon">👶</view>
+
+    <image class="no-family-img" src="/images/illustrations/welcome.png" mode="aspectFit" />
+
     <view class="no-family-title">欢迎使用宝宝成长助手</view>
+
     <view class="no-family-desc">请先创建或加入家庭，开始记录宝宝成长</view>
+
     <button class="btn-primary" hover-class="button-hover" bindtap="goFamily">去创建/加入家庭</button>
+
   </view>
 
-  <!-- 有家庭内容 -->
+
+
   <block wx:else>
-    <!-- 宝宝信息卡片 -->
+
     <view class="baby-card card fade-up" hover-class="card-hover">
+
       <view class="baby-info">
-        <view class="baby-avatar bubble-icon">👶</view>
+
+        <image class="baby-avatar-img" src="{{babyAvatarUrl}}" mode="aspectFill" />
+
         <view class="baby-detail">
+
           <view class="baby-name">{{babyName}}</view>
+
           <view class="baby-age">{{monthAge}}</view>
+
         </view>
+
       </view>
+
       <view class="family-link" hover-class="pressable-hover" bindtap="goFamily">
+
         <text>家庭管理</text>
+
         <text class="arrow">›</text>
+
       </view>
+
     </view>
 
-    <!-- 今日统计 -->
+
+
+    <view wx:if="{{yesterdayHint}}" class="yesterday-hint card fade-up" hover-class="card-hover" bindtap="goRecordsYesterday">
+      <text class="yesterday-hint-text">{{yesterdayHint}}</text>
+      <text class="yesterday-hint-arrow">去补记 ›</text>
+    </view>
+
+
+
     <view class="section-title">今日概况</view>
-    <view class="stats-row">
+
+    <view class="stats-grid">
+
       <view class="stat-card card milk-stat" hover-class="card-hover">
-        <view class="stat-emoji">🍼</view>
+
+        <image class="stat-icon" src="/images/icons/milk.png" mode="aspectFit" />
+
         <view class="stat-label">奶量</view>
-        <view>
+
+        <view class="stat-value">
+
           <text class="stat-number">{{totalMilk}}</text>
+
           <text class="stat-unit">ml</text>
+
         </view>
+
       </view>
+
       <view class="stat-card card food-stat" hover-class="card-hover">
-        <view class="stat-emoji">🥣</view>
+
+        <image class="stat-icon" src="/images/icons/food.png" mode="aspectFit" />
+
         <view class="stat-label">辅食</view>
-        <view>
-          <text class="stat-number">{{foodGrams}}</text>
-          <text class="stat-unit">g</text>        </view>
+
+        <view class="stat-value">
+
+          <text class="stat-number">{{foodStatValue}}</text>
+
+          <text class="stat-unit">{{foodStatUnit}}</text>
+
+        </view>
+
       </view>
+
       <view class="stat-card card sleep-stat" hover-class="card-hover">
-        <view class="stat-emoji">😴</view>
+
+        <image class="stat-icon" src="/images/icons/sleep.png" mode="aspectFit" />
+
         <view class="stat-label">睡眠</view>
-        <view class="stat-sleep">{{sleepText}}</view>
+
+        <view class="stat-value">
+
+          <block wx:if="{{showSleepHours}}">
+
+            <text class="stat-number">{{sleepHours}}</text>
+
+            <text class="stat-unit">小时</text>
+
+          </block>
+
+          <block wx:if="{{showSleepMinutes}}">
+
+            <text class="stat-number">{{sleepMinutes}}</text>
+
+            <text class="stat-unit">分钟</text>
+
+          </block>
+
+        </view>
+
       </view>
+
+      <view class="stat-card card poop-stat" hover-class="card-hover">
+
+        <image class="stat-icon" src="/images/icons/poop.png" mode="aspectFit" />
+
+        <view class="stat-label">拉粑粑</view>
+
+        <view class="stat-value">
+
+          <text class="stat-number">{{poopCount}}</text>
+
+          <text class="stat-unit">次</text>
+
+        </view>
+
+      </view>
+
     </view>
 
-    <!-- 快捷入口 -->
+
+
     <view class="section-title">快捷记录</view>
+
     <view class="quick-grid">
-      <view class="quick-item card milk" hover-class="card-hover" bindtap="goMilk">
-        <view class="quick-icon bubble-icon">🍼</view>
+
+      <view class="quick-item card milk fade-up" hover-class="card-hover" bindtap="goMilk">
+
+        <view class="quick-icon-wrap">
+
+          <image class="quick-icon-img" src="/images/icons/milk.png" mode="aspectFit" />
+
+        </view>
+
         <view class="quick-text">记奶量</view>
+
       </view>
-      <view class="quick-item card food" hover-class="card-hover" bindtap="goFood">
-        <view class="quick-icon bubble-icon">🥣</view>
+
+      <view class="quick-item card food fade-up" hover-class="card-hover" bindtap="goFood">
+
+        <view class="quick-icon-wrap">
+
+          <image class="quick-icon-img" src="/images/icons/food.png" mode="aspectFit" />
+
+        </view>
+
         <view class="quick-text">记辅食</view>
+
       </view>
-      <view class="quick-item card sleep" hover-class="card-hover" bindtap="goSleep">
-        <view class="quick-icon bubble-icon">😴</view>
+
+      <view class="quick-item card sleep fade-up" hover-class="card-hover" bindtap="goSleep">
+
+        <view class="quick-icon-wrap">
+
+          <image class="quick-icon-img" src="/images/icons/sleep.png" mode="aspectFit" />
+
+        </view>
+
         <view class="quick-text">记睡眠</view>
+
       </view>
-      <view class="quick-item card diary" hover-class="card-hover" bindtap="goDiary">
-        <view class="quick-icon bubble-icon">📝</view>
-        <view class="quick-text">写心得</view>
-      </view>
-      <view class="quick-item card poop" hover-class="card-hover" bindtap="goPoop">
-        <view class="quick-icon bubble-icon">💩</view>
+
+      <view class="quick-item card poop fade-up" hover-class="card-hover" bindtap="goPoop">
+
+        <view class="quick-icon-wrap">
+
+          <image class="quick-icon-img" src="/images/icons/poop.png" mode="aspectFit" />
+
+        </view>
+
         <view class="quick-text">记拉粑粑</view>
+
       </view>
+
+      <view class="quick-item card diary fade-up" hover-class="card-hover" bindtap="goDiary">
+
+        <view class="quick-icon-wrap">
+
+          <image class="quick-icon-img" src="/images/icons/diary.png" mode="aspectFit" />
+
+        </view>
+
+        <view class="quick-text">写心得</view>
+
+      </view>
+
     </view>
+
+
+
+    <view wx:if="{{timeline.length > 0}}" class="timeline-section">
+      <view class="section-title">今日时间线</view>
+      <view class="timeline-card card">
+
+      <view wx:for="{{timeline}}" wx:key="key" class="timeline-item">
+
+        <view class="timeline-icon-wrap">
+
+          <text class="timeline-icon">{{item.icon}}</text>
+
+        </view>
+
+        <view class="timeline-body">
+
+          <view class="timeline-title">{{item.title}}</view>
+
+          <view class="timeline-desc">{{item.desc}}</view>
+
+        </view>
+
+      </view>
+
+    </view>
+
+    </view>
+
   </block>
+
 </view>

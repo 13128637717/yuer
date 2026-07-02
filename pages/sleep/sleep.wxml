@@ -1,16 +1,21 @@
 <view class="container">
-  <view class="date-picker card" hover-class="card-hover">
-    <picker mode="date" value="{{recordDate}}" end="{{todayDate}}" bindchange="onDateChange">
-      <view class="date-display">
-        <text class="date-label">📅</text>
-        <text class="date-value">{{recordDate}}</text>
-        <text class="date-arrow">▼</text>
-      </view>
-    </picker>
+  <date-picker-card recordDate="{{recordDate}}" todayDate="{{todayDate}}" bindchange="onDateChange" />
+
+  <view wx:if="{{!sleepTimerActive}}" class="timer-card card fade-up">
+    <view class="section-title">睡眠计时</view>
+    <view class="timer-desc">宝宝睡着时点一下，醒来后再点，自动记录时长</view>
+    <button class="btn-primary" hover-class="button-hover" bindtap="startSleepTimer">开始睡觉</button>
+  </view>
+
+  <view wx:else class="timer-card card timer-active fade-up">
+    <view class="section-title">正在睡眠中</view>
+    <view class="timer-start">入睡时间 {{sleepTimerStart}}</view>
+    <button class="btn-primary" hover-class="button-hover" bindtap="wakeUpFromTimer">宝宝醒了</button>
+    <button class="btn-secondary btn-stack-gap" hover-class="button-hover" bindtap="cancelSleepTimer">取消计时</button>
   </view>
 
   <view class="form-card card {{editingIndex >= 0 ? 'is-editing' : ''}} fade-up">
-    <view class="section-title">{{editingIndex >= 0 ? '编辑睡眠' : '添加睡眠'}}</view>
+    <view class="section-title">{{editingIndex >= 0 ? '编辑睡眠' : '手动添加睡眠'}}</view>
     <view wx:if="{{editingIndex >= 0}}" class="edit-tip">正在调整这段睡眠记录，保存后会更新列表</view>
     <view class="form-group">
       <text class="form-label">入睡时间</text>
@@ -30,14 +35,14 @@
   <view class="list-card card sleep-list fade-up">
     <view class="section-title">{{isToday ? '今日' : recordDate}}记录 ({{sleepRecords.length}})</view>
     <view wx:if="{{sleepRecords.length === 0}}" class="empty-state">
-      <text class="empty-icon">😴</text>
+      <image class="empty-img" src="/images/illustrations/empty-record.png" mode="aspectFit" />
       <text class="empty-title">还没有睡眠记录</text>
-      <text class="empty-desc">记录入睡和起床时间，看看宝宝睡得香不香</text>
+      <text class="empty-desc">用计时器或手动添加，掌握宝宝作息</text>
     </view>
     <view wx:for="{{sleepRecords}}" wx:key="index" class="list-item" hover-class="list-item-hover">
       <view class="list-item-left">
         <view class="list-item-title">😴 {{item.startTime}} - {{item.endTime}}</view>
-        <view class="list-item-desc">{{item.durationText}}</view>
+        <view class="list-item-desc">时长 {{item.durationText}}{{item.recordedBy ? ' · ' + item.recordedBy : ''}}</view>
       </view>
       <view class="list-item-actions">
         <text class="action-btn" hover-class="pressable-hover" data-index="{{index}}" bindtap="editItem">编辑</text>
