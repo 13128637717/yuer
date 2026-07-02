@@ -1,5 +1,6 @@
 const { callFunction, getFamilyContext, ensureFamily } = require('../../utils/cloud');
 const { today, nowTime, calcSleepDuration, formatDuration } = require('../../utils/date');
+const { sortSleepRecords } = require('../../utils/record');
 
 const SLEEP_TIMER_PREFIX = 'sleepTimer_';
 
@@ -96,7 +97,7 @@ Page({
       duration,
       durationText: formatDuration(duration)
     };
-    const newList = [...this.data.sleepRecords, item].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    const newList = sortSleepRecords([...this.data.sleepRecords, item]);
     this.setData({ sleepRecords: newList });
     await this.persistRecords();
   },
@@ -107,10 +108,10 @@ Page({
         action: 'get',
         recordDate: this.data.recordDate
       });
-      const sleepRecords = (res.record.sleepRecords || []).map((s) => ({
+      const sleepRecords = sortSleepRecords((res.record.sleepRecords || []).map((s) => ({
         ...s,
         durationText: formatDuration(s.duration || calcSleepDuration(s.startTime, s.endTime))
-      }));
+      })));
       this.setData({ sleepRecords });
     } catch (err) {
       console.error(err);
@@ -156,7 +157,7 @@ Page({
     } else {
       newList.push(item);
     }
-    newList.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    newList = sortSleepRecords(newList);
 
     this.setData({
       sleepRecords: newList,

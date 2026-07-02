@@ -6,7 +6,43 @@
   </view>
 
   <block wx:else>
-    <view wx:if="{{weekSummary}}" class="week-summary card fade-up">{{weekSummary}}</view>
+    <view wx:if="{{weekTrend.visible}}" class="week-trend card fade-up">
+      <view class="week-trend-header">
+        <view class="section-title week-trend-title">近7天趋势</view>
+        <view class="week-trend-badge">截至昨日</view>
+      </view>
+      <view wx:if="{{weekTrend.loading}}" class="week-trend-skeleton">加载中...</view>
+      <view wx:else class="week-trend-grid">
+        <view class="week-trend-item milk-trend-item">
+          <view class="week-trend-item-head">
+            <image class="week-trend-icon" src="/images/icons/milk.png" mode="aspectFit" />
+            <text class="week-trend-label">日均奶量</text>
+          </view>
+          <view class="week-trend-value">
+            <text class="stat-number">{{weekTrend.avgMilk}}</text>
+            <text class="stat-unit">ml</text>
+          </view>
+          <view class="week-trend-change">
+            <text class="week-trend-change-label">较上周</text>
+            <text class="change-badge change-{{weekTrend.milkChangeDir}}">{{weekTrend.milkChange}}</text>
+          </view>
+        </view>
+        <view class="week-trend-item sleep-trend-item">
+          <view class="week-trend-item-head">
+            <image class="week-trend-icon" src="/images/icons/sleep.png" mode="aspectFit" />
+            <text class="week-trend-label">日均睡眠</text>
+          </view>
+          <view class="week-trend-value">
+            <text class="stat-number">{{weekTrend.avgSleepH}}</text>
+            <text class="stat-unit">小时</text>
+          </view>
+          <view class="week-trend-change">
+            <text class="week-trend-change-label">较上周</text>
+            <text class="change-badge change-{{weekTrend.sleepChangeDir}}">{{weekTrend.sleepChange}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
 
     <view class="tabs card pill-tabs">
       <view class="tab-item pill-tab {{days === 7 ? 'active' : ''}}" data-days="7" hover-class="pressable-hover" bindtap="switchDays">最近7天</view>

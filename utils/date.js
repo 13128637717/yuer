@@ -113,6 +113,25 @@ function daysAgo(n) {
   return formatDate(d);
 }
 
+/**
+ * 是否跨夜睡眠（结束时间早于开始时间）
+ */
+function isCrossMidnightSleep(startTime, endTime) {
+  if (!startTime || !endTime) return false;
+  return timeToMinutes(endTime) < timeToMinutes(startTime);
+}
+
+/**
+ * 当日时间线排序键（分钟）；跨夜记录减去 24h 使其排在最前
+ */
+function getDayTimelineSortKey(time, options = {}) {
+  const mins = timeToMinutes(time);
+  if (options.isCrossMidnight) {
+    return mins - 24 * 60;
+  }
+  return mins;
+}
+
 module.exports = {
   formatDate,
   today,
@@ -123,5 +142,7 @@ module.exports = {
   calcSleepDuration,
   formatDuration,
   nowTime,
-  daysAgo
+  daysAgo,
+  isCrossMidnightSleep,
+  getDayTimelineSortKey
 };

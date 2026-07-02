@@ -1,7 +1,7 @@
 const { callFunction, getFamilyContext, ensureFamily, syncFamilyContext, resolveCloudFileUrls } = require('../../utils/cloud');
 const { today, formatDuration, daysAgo } = require('../../utils/date');
 const { MILK_TYPE_MAP, POOP_STATUS_MAP } = require('../../utils/constants');
-const { calcFoodTotals, buildYesterdayHint } = require('../../utils/record');
+const { calcFoodTotals, buildYesterdayHint, sortSleepRecords } = require('../../utils/record');
 
 async function mapPoopRecordsWithUrls(poopRecords) {
   const list = poopRecords || [];
@@ -160,10 +160,10 @@ Page({
 
       const foodRecords = record.foodRecords || [];
       const poopRecords = await mapPoopRecordsWithUrls(record.poopRecords || []);
-      const sleepRecords = (record.sleepRecords || []).map((s) => ({
+      const sleepRecords = sortSleepRecords((record.sleepRecords || []).map((s) => ({
         ...s,
         durationText: formatDuration(s.duration || 0)
-      }));
+      })));
 
       const diaryImages = record.diaryImages || [];
       const diaryImageUrls = diaryImages.length

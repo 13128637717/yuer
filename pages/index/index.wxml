@@ -205,28 +205,39 @@
 
     <view wx:if="{{timeline.length > 0}}" class="timeline-section">
       <view class="section-title">今日时间线</view>
-      <view class="timeline-card card">
-
-      <view wx:for="{{timeline}}" wx:key="key" class="timeline-item">
-
-        <view class="timeline-icon-wrap">
-
-          <text class="timeline-icon">{{item.icon}}</text>
-
+      <view class="timeline-panel card">
+        <view class="timeline-list">
+          <view
+            wx:for="{{timeline}}"
+            wx:key="key"
+            class="timeline-item timeline-{{item.type}} fade-up"
+            style="--item-index: {{index}}"
+          >
+            <view class="timeline-time-col">
+              <text class="timeline-time">{{item.time}}</text>
+            </view>
+            <view class="timeline-axis-col">
+              <view class="timeline-dot"></view>
+              <view wx:if="{{index < timeline.length - 1}}" class="timeline-line"></view>
+            </view>
+            <view class="timeline-card">
+              <view class="timeline-card-row">
+                <view class="timeline-icon-wrap">
+                  <image class="timeline-icon-img" src="{{item.iconSrc}}" mode="aspectFit" />
+                </view>
+                <view class="timeline-info">
+                  <view class="timeline-title-row">
+                    <text class="timeline-label">{{item.label}}</text>
+                    <text class="timeline-detail">{{item.detail}}</text>
+                    <text wx:if="{{item.timeRange}}" class="timeline-time-range">{{item.timeRange}}</text>
+                  </view>
+                  <view wx:if="{{item.subDetail}}" class="timeline-meta">{{item.subDetail}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
         </view>
-
-        <view class="timeline-body">
-
-          <view class="timeline-title">{{item.title}}</view>
-
-          <view class="timeline-desc">{{item.desc}}</view>
-
-        </view>
-
       </view>
-
-    </view>
-
     </view>
 
   </block>

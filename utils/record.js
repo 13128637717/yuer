@@ -1,4 +1,9 @@
-const { formatDuration, calcSleepDuration } = require('./date');
+const {
+  formatDuration,
+  calcSleepDuration,
+  isCrossMidnightSleep,
+  getDayTimelineSortKey
+} = require('./date');
 const { POOP_STATUS_MAP } = require('./constants');
 
 /**
@@ -116,6 +121,21 @@ function withRecordedBy(text, recordedBy) {
 }
 
 /**
+ * 睡眠记录排序：跨夜睡眠（如前晚 22:00→次日 07:00）排在最前
+ */
+function sortSleepRecords(sleepRecords) {
+  return [...(sleepRecords || [])].sort((a, b) => {
+    const keyA = getDayTimelineSortKey(a.startTime, {
+      isCrossMidnight: isCrossMidnightSleep(a.startTime, a.endTime)
+    });
+    const keyB = getDayTimelineSortKey(b.startTime, {
+      isCrossMidnight: isCrossMidnightSleep(b.startTime, b.endTime)
+    });
+    return keyA - keyB;
+  });
+}
+
+/**
  * 合并当日各类型记录为按时间排序的时间线
  */
 function buildDayTimeline(record) {
@@ -125,30 +145,39 @@ function buildDayTimeline(record) {
       key: `milk-${i}`,
       type: 'milk',
       time: m.time,
-      icon: '🍼',
-      title: `${m.time} 奶量`,
-      desc: withRecordedBy(`${m.amount} ml`, m.recordedBy)
+      label: '奶量',
+      iconSrc: '/images/icons/milk.png',
+      detail: `${m.amount} ml`,
+      subDetail: ''
     });
   });
   (record.foodRecords || []).forEach((f, i) => {
+    const unit = f.unit === 'ml' ? 'ml' : 'g';
+    const foodName = (f.foodName || '').trim();
+    const detail = foodName ? `${foodName} ${f.amount}${unit}` : `${f.amount}${unit}`;
     items.push({
       key: `food-${i}`,
       type: 'food',
       time: f.time,
-      icon: '🥣',
-      title: `${f.time} 辅食`,
-      desc: withRecordedBy(`${f.foodName || ''} ${f.amount}${f.unit === 'ml' ? 'ml' : 'g'}`, f.recordedBy)
+      label: '辅食',
+      iconSrc: '/images/icons/food.png',
+      detail,
+      subDetail: ''
     });
   });
   (record.sleepRecords || []).forEach((s, i) => {
     const dur = s.duration || calcSleepDuration(s.startTime, s.endTime);
+    const isCrossMidnight = isCrossMidnightSleep(s.startTime, s.endTime);
     items.push({
       key: `sleep-${i}`,
       type: 'sleep',
       time: s.startTime,
-      icon: '😴',
-      title: `${s.startTime}-${s.endTime} 睡眠`,
-      desc: withRecordedBy(formatDuration(dur), s.recordedBy)
+      isCrossMidnight,
+      label: '睡眠',
+      iconSrc: '/images/icons/sleep.png',
+      detail: formatDuration(dur),
+      timeRange: s.endTime ? `${s.startTime} 至 ${s.endTime}` : '',
+      subDetail: ''
     });
   });
   (record.poopRecords || []).forEach((p, i) => {
@@ -156,12 +185,17 @@ function buildDayTimeline(record) {
       key: `poop-${i}`,
       type: 'poop',
       time: p.time,
-      icon: '💩',
-      title: `${p.time} 拉粑粑`,
-      desc: withRecordedBy(POOP_STATUS_MAP[p.status] || p.status || '', p.recordedBy)
+      label: '拉粑粑',
+      iconSrc: '/images/icons/poop.png',
+      detail: POOP_STATUS_MAP[p.status] || p.status || '',
+      subDetail: ''
     });
   });
-  items.sort((a, b) => String(a.time).localeCompare(String(b.time)));
+  items.sort((a, b) => {
+    const keyA = getDayTimelineSortKey(a.time, { isCrossMidnight: a.isCrossMidnight });
+    const keyB = getDayTimelineSortKey(b.time, { isCrossMidnight: b.isCrossMidnight });
+    return keyA - keyB;
+  });
   return items;
 }
 
@@ -183,6 +217,7 @@ module.exports = {
   calcFoodTotals,
   calcFoodGrams,
   formatRecordsExport,
+  sortSleepRecords,
   buildDayTimeline,
   buildYesterdayHint
 };

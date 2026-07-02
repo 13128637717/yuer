@@ -143,14 +143,25 @@ function calcAvg(stats, field) {
   return Math.round(sum / stats.length);
 }
 
-function formatChangePercent(current, previous) {
-  if (!previous && !current) return '持平';
-  if (!previous) return '新增';
+function formatChangeMeta(current, previous) {
+  if (!previous && !current) return { text: '持平', dir: 'flat' };
+  if (!previous) return { text: '新增', dir: 'new' };
   const pct = Math.round(((current - previous) / previous) * 100);
-  if (pct > 0) return `+${pct}%`;
-  if (pct < 0) return `${pct}%`;
-  return '持平';
+  if (pct > 0) return { text: `+${pct}%`, dir: 'up' };
+  if (pct < 0) return { text: `${pct}%`, dir: 'down' };
+  return { text: '持平', dir: 'flat' };
 }
+
+const EMPTY_WEEK_TREND = {
+  loading: false,
+  visible: false,
+  avgMilk: 0,
+  avgSleepH: 0,
+  milkChange: '持平',
+  milkChangeDir: 'flat',
+  sleepChange: '持平',
+  sleepChangeDir: 'flat'
+};
 
 Page({
   data: {
@@ -161,7 +172,7 @@ Page({
     ecFood: { onInit: initFoodChart },
     ecPoop: { onInit: initPoopChart },
     loading: true,
-    weekSummary: '',
+    weekTrend: { ...EMPTY_WEEK_TREND, loading: true, visible: true },
     showExport: false,
     exportRange: 'week',
     exportText: '',
@@ -173,7 +184,7 @@ Page({
   async onShow() {
     await syncFamilyContext(true);
     if (!getFamilyContext().hasFamily) {
-      this.setData({ hasFamily: false, loading: false, showExport: false, weekSummary: '' });
+      this.setData({ hasFamily: false, loading: false, showExport: false, weekTrend: { ...EMPTY_WEEK_TREND } });
       return;
     }
     this.setData({ hasFamily: true, showExport: false });
@@ -190,26 +201,41 @@ Page({
   async loadWeekSummary() {
     const { familyId } = getFamilyContext();
     if (!familyId) return;
+    this.setData({ weekTrend: { ...EMPTY_WEEK_TREND, loading: true, visible: true } });
     try {
-      const endDate = today();
-      const thisStart = daysAgo(6);
-      const lastEnd = daysAgo(7);
-      const lastStart = daysAgo(13);
+      const endDate = daysAgo(1);
+      const thisStart = daysAgo(7);
+      const lastEnd = daysAgo(8);
+      const lastStart = daysAgo(14);
       const [thisRes, lastRes] = await Promise.all([
         callFunction('getStats', { familyId, startDate: thisStart, endDate }),
         callFunction('getStats', { familyId, startDate: lastStart, endDate: lastEnd })
       ]);
-      const thisStats = thisRes.stats || [];
+      const todayStr = today();
+      const thisStats = (thisRes.stats || []).filter((s) => s.date !== todayStr);
       const lastStats = lastRes.stats || [];
       const avgMilk = calcAvg(thisStats, 'totalMilk');
       const prevMilk = calcAvg(lastStats, 'totalMilk');
-      const avgSleepH = Math.round((calcAvg(thisStats, 'totalSleepMin') / 60) * 10) / 10;
-      const change = formatChangePercent(avgMilk, prevMilk);
+      const avgSleepMin = calcAvg(thisStats, 'totalSleepMin');
+      const prevSleepMin = calcAvg(lastStats, 'totalSleepMin');
+      const avgSleepH = Math.round((avgSleepMin / 60) * 10) / 10;
+      const milkMeta = formatChangeMeta(avgMilk, prevMilk);
+      const sleepMeta = formatChangeMeta(avgSleepMin, prevSleepMin);
       this.setData({
-        weekSummary: `近7天日均奶量 ${avgMilk} ml（较上周 ${change}），日均睡眠 ${avgSleepH} 小时`
+        weekTrend: {
+          loading: false,
+          visible: true,
+          avgMilk,
+          avgSleepH,
+          milkChange: milkMeta.text,
+          milkChangeDir: milkMeta.dir,
+          sleepChange: sleepMeta.text,
+          sleepChangeDir: sleepMeta.dir
+        }
       });
     } catch (err) {
       console.error(err);
+      this.setData({ weekTrend: { ...EMPTY_WEEK_TREND } });
     }
   },
 
